@@ -8,20 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		1E8B04011D944F6900E20A44 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B04001D944F6900E20A44 /* AppDelegate.swift */; };
-		1E8B04031D944F6900E20A44 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B04021D944F6900E20A44 /* ViewController.swift */; };
+		1E8B04031D944F6900E20A44 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B04021D944F6900E20A44 /* MapViewController.swift */; };
 		1E8B04061D944F6900E20A44 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1E8B04041D944F6900E20A44 /* Main.storyboard */; };
 		1E8B04081D944F6900E20A44 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E8B04071D944F6900E20A44 /* Assets.xcassets */; };
 		1E8B040B1D944F6900E20A44 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1E8B04091D944F6900E20A44 /* LaunchScreen.storyboard */; };
+		1E8B04131D94550A00E20A44 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B04121D94550A00E20A44 /* DataController.swift */; };
+		1E8B04151D94706C00E20A44 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B04141D94706C00E20A44 /* Model.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1E8B03FD1D944F6900E20A44 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E8B04001D944F6900E20A44 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		1E8B04021D944F6900E20A44 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		1E8B04021D944F6900E20A44 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		1E8B04051D944F6900E20A44 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1E8B04071D944F6900E20A44 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1E8B040A1D944F6900E20A44 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1E8B040C1D944F6900E20A44 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1E8B04121D94550A00E20A44 /* DataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
+		1E8B04141D94706C00E20A44 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,7 +59,9 @@
 			isa = PBXGroup;
 			children = (
 				1E8B04001D944F6900E20A44 /* AppDelegate.swift */,
-				1E8B04021D944F6900E20A44 /* ViewController.swift */,
+				1E8B04021D944F6900E20A44 /* MapViewController.swift */,
+				1E8B04121D94550A00E20A44 /* DataController.swift */,
+				1E8B04141D94706C00E20A44 /* Model.swift */,
 				1E8B04041D944F6900E20A44 /* Main.storyboard */,
 				1E8B04071D944F6900E20A44 /* Assets.xcassets */,
 				1E8B04091D944F6900E20A44 /* LaunchScreen.storyboard */,
@@ -137,8 +143,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1E8B04031D944F6900E20A44 /* ViewController.swift in Sources */,
+				1E8B04031D944F6900E20A44 /* MapViewController.swift in Sources */,
+				1E8B04131D94550A00E20A44 /* DataController.swift in Sources */,
 				1E8B04011D944F6900E20A44 /* AppDelegate.swift in Sources */,
+				1E8B04151D94706C00E20A44 /* Model.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
