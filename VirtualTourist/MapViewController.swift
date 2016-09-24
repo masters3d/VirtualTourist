@@ -16,22 +16,32 @@ class MapViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // add the edit button on the right
         self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        // set gesture recognizer
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(longPressDetected(_:)))
+        mapView.addGestureRecognizer(longPress)
+        
     }
+    
+    func longPressDetected(_ gesture: UIGestureRecognizer) {
+        if gesture.state == .began {
+            if isEditing {
+                print("need to implement this")
+                print(mapView.selectedAnnotations)
+            } else {
+                let point = gesture.location(in: self.mapView)
+                let coordinate = mapView.convert(point, toCoordinateFrom: mapView)
+                let annotation = Pin(coordinate: coordinate)
+                mapView.addAnnotation(annotation)
+            }
+        }
+    }
+    
 
-    lazy var infoView: UILabel = {
-        let size = CGSize(width: self.view.frame.size.width, height: 70 )
-        let origin = CGPoint(x: self.view.frame.origin.x, y: self.view.frame.height - 70)
-        let frame = CGRect(origin: origin , size: size)
-        let info = UILabel(frame: frame )
-        info.backgroundColor = UIColor.white
-        info.textColor = UIColor.red
-        info.textAlignment = .center
-        info.text = "Tap Pins to Delete"
-        info.font = UIFont.boldSystemFont(ofSize: 14)
-        return info
-    }()
+    lazy var infoView: UILabel = self.infoViewCreator()
 
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)

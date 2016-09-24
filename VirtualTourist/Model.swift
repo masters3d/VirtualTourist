@@ -9,31 +9,10 @@
 import Foundation
 import MapKit
 
-extension CLLocationCoordinate2D: Hashable {
-	public var hashValue: Int {
-        return (latitude.hashValue&*397) &+ longitude.hashValue;
-    }
 
-    static public func ==(lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
-        return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
-    }
-}
-
-extension Pin: Hashable {
-    static func ==(lhs:Pin, rhs:Pin ) -> Bool {
-        return lhs.title == rhs.title &&
-            lhs.subtitle == rhs.subtitle &&
-            lhs.coordinate == rhs.coordinate
-    }
-
-    var hashValue: Int {
-        return self.coordinate.hashValue
-    }
-}
-
-final class Pin {
-    let title: String
-    let subtitle: String
+class Pin:NSObject, MKAnnotation {
+    let title: String?
+    let subtitle: String?
     var coordinate: CLLocationCoordinate2D
     
     init(title:String = "", subtitle: String = "", coordinate: CLLocationCoordinate2D ) {
