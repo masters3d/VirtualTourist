@@ -10,8 +10,7 @@ import UIKit
 
 class DataController {
 
-private var photos = [Pin : [Photo]]()
-private var pins = [Pin]()
+private var photos = [Pin : [Photo]]() { didSet { print(photos.count)}}
 
 func getPhotos(for pin:Pin) -> [Photo] {
 
@@ -27,6 +26,10 @@ func getPhotos(for pin:Pin) -> [Photo] {
 
 func set(photos photosToAdd: [Photo], for pin:Pin) {
     photos[pin] = photosToAdd
+}
+
+func remove(_ pin:Pin) {
+    photos[pin] = nil
 }
 
 

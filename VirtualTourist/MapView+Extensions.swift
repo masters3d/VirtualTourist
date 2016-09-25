@@ -10,13 +10,17 @@ import UIKit
 
 extension MapViewController {
 
+    var appDelegate:AppDelegate {
+        return UIApplication.shared.delegate as! AppDelegate
+    }
+    
     func infoViewCreator() -> UILabel {
         let size = CGSize(width: self.view.frame.size.width, height: 70 )
         let origin = CGPoint(x: self.view.frame.origin.x, y: self.view.frame.height - 70)
         let frame = CGRect(origin: origin , size: size)
         let info = UILabel(frame: frame )
-        info.backgroundColor = UIColor.white
-        info.textColor = UIColor.red
+        info.backgroundColor = UIColor.red
+        info.textColor = UIColor.white
         info.textAlignment = .center
         info.text = "Tap Pins to Delete"
         info.font = UIFont.boldSystemFont(ofSize: 14)
