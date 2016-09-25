@@ -11,7 +11,7 @@ import MapKit
 
 
 class MapViewController: UIViewController {
-
+    
     @IBOutlet weak var mapView: MKMapView!
     
     override func viewDidLoad() {
@@ -68,7 +68,14 @@ class MapViewController: UIViewController {
         
 }
 
+    // Error Reporting
+    
+    var errorReported: Error?
+    var isAlertPresenting: Bool = false
+
+
 }
+
 
 extension MapViewController: MKMapViewDelegate {
 

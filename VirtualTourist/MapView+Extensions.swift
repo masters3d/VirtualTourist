@@ -8,11 +8,21 @@
 
 import UIKit
 
-extension MapViewController {
+extension UIViewController {
 
     var appDelegate:AppDelegate {
         return UIApplication.shared.delegate as! AppDelegate
     }
+    //TODO:- Remove after testing
+    var isAlertShowingComputed:Bool {
+        guard let window = self.appDelegate.window else { return false }
+        return !window.subviews.filter{
+                        $0.isKind(of: UIAlertController.self)}.isEmpty
+    }
+
+}
+
+extension MapViewController {
     
     func infoViewCreator() -> UILabel {
         let size = CGSize(width: self.view.frame.size.width, height: 70 )
