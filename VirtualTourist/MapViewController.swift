@@ -76,6 +76,20 @@ class MapViewController: UIViewController {
 
 }
 
+extension MapViewController {
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    
+    guard let identifier = segue.identifier else { return }
+    switch identifier {
+        case "showPhotoDetail":
+            print("")
+         default: break
+    }
+    
+}
+}
+
 
 extension MapViewController: MKMapViewDelegate {
 
@@ -84,8 +98,8 @@ extension MapViewController: MKMapViewDelegate {
         if isEditing {
             removePin(view.annotation as! Pin)
         } else {
-            
-        
+           
+        self.performSegue(withIdentifier: "showPhotoDetail", sender: self)
         }
     }
     
