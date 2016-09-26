@@ -23,7 +23,10 @@ extension ActivityReporting {
 }
 
 protocol ErrorReporting: class, ActivityReporting {
+    // optional for UIViewControllers
     func reportErrorFromOperation(_ operationError: Error?)
+    
+    //Required
     var errorReported: Error? { get set }
     var isAlertPresenting: Bool { get set }
 }

@@ -11,6 +11,7 @@
 		1E58FF051D98681200ED255E /* SharedErrorHandeling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E58FF041D98681200ED255E /* SharedErrorHandeling.swift */; };
 		1E58FF071D988D7700ED255E /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E58FF061D988D7700ED255E /* DetailViewController.swift */; };
 		1E58FF0C1D98906800ED255E /* DetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E58FF0B1D98906800ED255E /* DetailCell.swift */; };
+		1E58FF0E1D9988BE00ED255E /* NetworkController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E58FF0D1D9988BE00ED255E /* NetworkController.swift */; };
 		1E8B04011D944F6900E20A44 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B04001D944F6900E20A44 /* AppDelegate.swift */; };
 		1E8B04031D944F6900E20A44 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B04021D944F6900E20A44 /* MapViewController.swift */; };
 		1E8B04061D944F6900E20A44 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1E8B04041D944F6900E20A44 /* Main.storyboard */; };
@@ -25,6 +26,7 @@
 		1E58FF041D98681200ED255E /* SharedErrorHandeling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SharedErrorHandeling.swift; sourceTree = "<group>"; };
 		1E58FF061D988D7700ED255E /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		1E58FF0B1D98906800ED255E /* DetailCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailCell.swift; sourceTree = "<group>"; };
+		1E58FF0D1D9988BE00ED255E /* NetworkController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkController.swift; sourceTree = "<group>"; };
 		1E8B03FD1D944F6900E20A44 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E8B04001D944F6900E20A44 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1E8B04021D944F6900E20A44 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 		1E58FF0A1D988EA900ED255E /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				1E58FF0D1D9988BE00ED255E /* NetworkController.swift */,
 				1E58FF041D98681200ED255E /* SharedErrorHandeling.swift */,
 			);
 			name = Controller;
@@ -187,6 +190,7 @@
 				1E58FF071D988D7700ED255E /* DetailViewController.swift in Sources */,
 				1E58FF0C1D98906800ED255E /* DetailCell.swift in Sources */,
 				1E8B04151D94706C00E20A44 /* Model.swift in Sources */,
+				1E58FF0E1D9988BE00ED255E /* NetworkController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
