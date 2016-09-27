@@ -25,7 +25,6 @@ class MapViewController: UIViewController, ErrorReporting {
         mapView.addGestureRecognizer( UILongPressGestureRecognizer(
             target: self, action: #selector(longPressDetected(_:)))
             )
-        
     }
     
     func longPressDetected(_ gesture: UIGestureRecognizer) {
@@ -40,7 +39,6 @@ class MapViewController: UIViewController, ErrorReporting {
                 let annotation = Pin(coordinate: coordinate)
                 // add to map and data store
                 addPin(annotation)
-                
             }
         }
     }
@@ -94,7 +92,6 @@ extension MapViewController {
     
 }
 }
-
 
 extension MapViewController: MKMapViewDelegate {
 
