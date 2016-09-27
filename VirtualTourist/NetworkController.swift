@@ -7,6 +7,16 @@
 //
 
 import UIKit
+import Swift
+
+extension Array {
+
+func removingObjects(atIndexes: [Int]) -> Array {
+    return self.enumerated()
+    .filter { !atIndexes.contains($0.offset) }
+    .map { $0.element }
+}
+}
 
 class NetworkOperation: Operation, URLSessionDataDelegate {
     //Error Reporting

@@ -12,15 +12,19 @@ class DataController {
     
     private var photos = [Pin : [Photo]]()
     
-    func getPhotos(for pin:Pin) -> [Photo] {
+    private func getNewPhotos(for pin:Pin) -> [Photo] {
+        let image = #imageLiteral(resourceName: "Placeholder")
+        let data = UIImagePNGRepresentation(image)
+        let tempPhoto = Photo(height: Double(image.size.height), imageData: data!, title: "none given", width: Double(image.size.height))
+        photos[pin] = Array(repeatElement(tempPhoto, count: 9))
+        return photos[pin] ?? []
+    }
+    
+    func getPhotos(for pin:Pin, newSet:Bool = false) -> [Photo] {
         if let result = photos[pin] {
-            return result
+            return newSet ? getNewPhotos(for: pin) : result
         } else {
-            let image = #imageLiteral(resourceName: "Placeholder")
-            let data = UIImagePNGRepresentation(image)
-            let tempPhoto = Photo(height: Double(image.size.height), imageData: data!, title: "none given", width: Double(image.size.height))
-            photos[pin] = Array(repeatElement(tempPhoto, count: 9))
-            return photos[pin] ?? []
+            return getNewPhotos(for: pin)
         }
     }
     

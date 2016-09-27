@@ -9,6 +9,13 @@
 import UIKit
 import MapKit
 
+enum Constants {
+    
+    static var newCollection:String { return "New Collection" }
+    static var removeSelected:String { return "Remove Selected Pictures" }
+    
+}
+
 extension UIColor {
     open class var defaultBlue: UIColor { return UIColor(red: 0, green: 122/255, blue: 1, alpha: 1) }
 }

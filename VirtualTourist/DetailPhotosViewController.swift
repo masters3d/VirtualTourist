@@ -37,22 +37,58 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     var selectedIndex = Set<IndexPath>() {
         didSet{
             if selectedIndex.isEmpty {
-                bottomLabelForActionButton.title = "New Collection"
+                bottomLabelForActionButton.title = Constants.newCollection
                 bottomLabelForActionButton.tintColor = UIColor.defaultBlue
             } else {
-                bottomLabelForActionButton.title = "Remove Selected Pictures"
+                bottomLabelForActionButton.title = Constants.removeSelected
                 bottomLabelForActionButton.tintColor = UIColor.red
             }
         }
     }
     
+    
     @IBOutlet weak var bottomLabelForActionButton: UIBarButtonItem!
 
     @IBAction func newCollectionOrDeleteSelectedButton(_ sender: UIBarButtonItem) {
+        guard let buttonTitle = sender.title  else { return }
+        
+        collectionView.performBatchUpdates({
+            if buttonTitle == Constants.removeSelected {
+                var photos = self.dataCache.getPhotos(for: self.pin)
+                let indexes = self.selectedIndex.map{$0.row}
+                photos = photos.removingObjects(atIndexes: indexes)
+                
+                // resetting the selection because the cell objects are reused
+                for each in self.selectedIndex {
+                    let cell = self.collectionView.cellForItem(at: each) as! DetailCell
+                    cell.imageView.alpha = 1
+                }
+                
+                self.collectionView.deleteItems(at: Array(self.selectedIndex))
+                self.selectedIndex.removeAll()
+                self.dataCache.set(photos: photos, for: self.pin)
+                
+            } else {
+                let photos = self.dataCache.getPhotos(for: self.pin, newSet: true)
+                self.dataCache.set(photos: photos, for: self.pin)
+                self.collectionView.reloadSections(IndexSet(integer: 0))
+            }
+            }, completion: { success in
+            self.updateNoImageLabel()
+        })
     }
 
-    
 
+    func updateNoImageLabel(){
+        if self.dataCache.getPhotos(for: self.pin).isEmpty {
+            self.noImagesLabel.isHidden = false
+        } else {
+            self.noImagesLabel.isHidden = true
+            
+        }
+        
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = self
@@ -62,6 +98,8 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
+        updateNoImageLabel()
+
         // Set UP
         setMap(mapView, with: pin)
         //this will layout 3 pictures across
@@ -69,16 +107,16 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        updateNoImageLabel()
         return dataCache.getPhotos(for: pin).count
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as! DetailCell
-        
         if selectedIndex.contains(indexPath) {
-                selectedIndex.remove(indexPath)
                 cell.imageView.alpha = 1
+                selectedIndex.remove(indexPath)
+
         } else {
             selectedIndex.insert(indexPath)
             cell.imageView.alpha = 0.2
