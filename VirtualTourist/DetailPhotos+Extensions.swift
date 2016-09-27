@@ -9,6 +9,10 @@
 import UIKit
 import MapKit
 
+extension UIColor {
+    open class var defaultBlue: UIColor { return UIColor(red: 0, green: 122/255, blue: 1, alpha: 1) }
+}
+
 extension DetailPhotosViewController {
     
     func setMap(_ map:MKMapView ,with pin:Pin) {

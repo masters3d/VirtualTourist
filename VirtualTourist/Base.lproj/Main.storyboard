@@ -117,7 +117,11 @@
                                         </constraints>
                                         <items>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="Td5-OK-71h"/>
-                                            <barButtonItem title="New Collection" id="yiP-35-NS0"/>
+                                            <barButtonItem title="New Collection" id="yiP-35-NS0">
+                                                <connections>
+                                                    <action selector="newCollectionOrDeleteSelectedButton:" destination="4V2-5s-giV" id="DCv-mz-Lh3"/>
+                                                </connections>
+                                            </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="CHM-92-Qbf"/>
                                         </items>
                                     </toolbar>
@@ -143,6 +147,7 @@
                     </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <connections>
+                        <outlet property="bottomLabelForActionButton" destination="yiP-35-NS0" id="Vts-FU-OcS"/>
                         <outlet property="collectionView" destination="sv6-iQ-hbj" id="12N-3e-gxx"/>
                         <outlet property="mapView" destination="9W6-9K-1NB" id="hKV-Ai-6Xs"/>
                         <outlet property="noImagesLabel" destination="TBP-7a-dE6" id="mJk-N1-y71"/>

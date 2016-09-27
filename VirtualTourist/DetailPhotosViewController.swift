@@ -32,6 +32,27 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
 
     @IBOutlet weak var collectionView: UICollectionView!
 
+    // Bottom Button Logic
+    
+    var selectedIndex = Set<IndexPath>() {
+        didSet{
+            if selectedIndex.isEmpty {
+                bottomLabelForActionButton.title = "New Collection"
+                bottomLabelForActionButton.tintColor = UIColor.defaultBlue
+            } else {
+                bottomLabelForActionButton.title = "Remove Selected Pictures"
+                bottomLabelForActionButton.tintColor = UIColor.red
+            }
+        }
+    }
+    
+    @IBOutlet weak var bottomLabelForActionButton: UIBarButtonItem!
+
+    @IBAction func newCollectionOrDeleteSelectedButton(_ sender: UIBarButtonItem) {
+    }
+
+    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = self
@@ -51,6 +72,19 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         return dataCache.getPhotos(for: pin).count
     }
     
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let cell = collectionView.cellForItem(at: indexPath) as! DetailCell
+        
+        if selectedIndex.contains(indexPath) {
+                selectedIndex.remove(indexPath)
+                cell.imageView.alpha = 1
+        } else {
+            selectedIndex.insert(indexPath)
+            cell.imageView.alpha = 0.2
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DetailCellReusableID", for: indexPath) as! DetailCell
         let photoObject =
@@ -60,7 +94,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         
         if photoObject.isImagePlaceholder {
             cell.activityIndicatorStart()
-            
+            //TODO:- figure out a way to move this to the Data Controller
             let block = { (data:Data?) in
                 if let data = data, let image = UIImage(data: data) {
                     DispatchQueue.main.async(execute: {
@@ -68,16 +102,14 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
                         cell.activityIndicatorStop()
                         let photo = Photo(height: Double(image.size.height),
                                           imageData: data, title: "", width: Double(image.size.width))
-                        
                         if self.dataCache.setPhoto(photo, atIndex: indexPath.row, for: self.pin)
                         { } else {
                             print("*****There was an error setting photo")
                         }
-                        
                     })
-
                 }
             }
+
             let networkRequest = NetworkOperation(typeOfConnection: .lorempixel, delegate: self, successBlock: block, showActivityOnUI: false)
             networkRequest.start()
             
