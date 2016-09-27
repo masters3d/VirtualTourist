@@ -32,6 +32,20 @@ final class Photo {
     // path
     // pin
     
+    var image:UIImage? { return UIImage(data: imageData) }
+    
+    var isImagePlaceholder:Bool {
+        if let image = image {
+            let placeholder = #imageLiteral(resourceName: "Placeholder")
+         return  UIImagePNGRepresentation(placeholder) == UIImagePNGRepresentation(image)
+        } else {
+            return false
+        }
+        
+        
+    }
+    
+    
     init(height: Double, imageData: Data, title: String, width: Double) {
         self.height = height
         self.imageData = imageData

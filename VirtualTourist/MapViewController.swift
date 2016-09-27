@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 
 
-class MapViewController: UIViewController {
+class MapViewController: UIViewController, ErrorReporting {
     
     @IBOutlet weak var mapView: MKMapView!
     
@@ -73,6 +73,9 @@ class MapViewController: UIViewController {
     var errorReported: Error?
     var isAlertPresenting: Bool = false
 
+    // Pin to send to segue
+    
+    var pin:Pin?
 
 }
 
@@ -83,7 +86,9 @@ extension MapViewController {
     guard let identifier = segue.identifier else { return }
     switch identifier {
         case "showPhotoDetail":
-            print("")
+            guard let pin = pin else { self.presentErrorPopUp(" Error showing Detail"); return }
+            guard let destination = segue.destination as? DetailPhotosViewController else { return }
+            destination.setPinForMap(pin)
          default: break
     }
     
@@ -98,7 +103,7 @@ extension MapViewController: MKMapViewDelegate {
         if isEditing {
             removePin(view.annotation as! Pin)
         } else {
-           
+           pin = view.annotation as? Pin
         self.performSegue(withIdentifier: "showPhotoDetail", sender: self)
         }
     }

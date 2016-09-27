@@ -6,12 +6,7 @@
 //  Copyright © 2016 masters3d. All rights reserved.
 //
 
-
 import UIKit
-
-
-
-
 
 class NetworkOperation: Operation, URLSessionDataDelegate {
     //Error Reporting
