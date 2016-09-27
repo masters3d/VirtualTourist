@@ -84,9 +84,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
             self.noImagesLabel.isHidden = false
         } else {
             self.noImagesLabel.isHidden = true
-            
         }
-        
     }
     
     override func viewDidLoad() {
@@ -99,8 +97,6 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         super.viewDidLayoutSubviews()
         
         updateNoImageLabel()
-
-        // Set UP
         setMap(mapView, with: pin)
         //this will layout 3 pictures across
         setCollection(collectionView)
@@ -132,22 +128,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         
         if photoObject.isImagePlaceholder {
             cell.activityIndicatorStart()
-            //TODO:- figure out a way to move this to the Data Controller
-            let block = { (data:Data?) in
-                if let data = data, let image = UIImage(data: data) {
-                    DispatchQueue.main.async(execute: {
-                        cell.imageView.image = image
-                        cell.activityIndicatorStop()
-                        let photo = Photo(height: Double(image.size.height),
-                                          imageData: data, title: "", width: Double(image.size.width))
-                        if self.dataCache.setPhoto(photo, atIndex: indexPath.row, for: self.pin)
-                        { } else {
-                            print("*****There was an error setting photo")
-                        }
-                    })
-                }
-            }
-
+            let block = dataCache.createSuccessBlock(forCell: cell, forIndexPath: indexPath, withPin: pin)
             let networkRequest = NetworkOperation(typeOfConnection: .lorempixel, delegate: self, successBlock: block, showActivityOnUI: false)
             networkRequest.start()
             

@@ -20,6 +20,7 @@
 		1E8B04151D94706C00E20A44 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B04141D94706C00E20A44 /* Model.swift */; };
 		1E946C6D1D99DFC0008CDBFF /* DetailPhotosViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E58FF061D988D7700ED255E /* DetailPhotosViewController.swift */; };
 		1E946C6F1D99F36B008CDBFF /* DetailPhotos+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E946C6E1D99F36B008CDBFF /* DetailPhotos+Extensions.swift */; };
+		1E946C711D9B2B3D008CDBFF /* DataController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E946C701D9B2B3D008CDBFF /* DataController+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 		1E8B04121D94550A00E20A44 /* DataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		1E8B04141D94706C00E20A44 /* Model.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		1E946C6E1D99F36B008CDBFF /* DetailPhotos+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DetailPhotos+Extensions.swift"; sourceTree = "<group>"; };
+		1E946C701D9B2B3D008CDBFF /* DataController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DataController+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +57,7 @@
 			isa = PBXGroup;
 			children = (
 				1E8B04121D94550A00E20A44 /* DataController.swift */,
+				1E946C701D9B2B3D008CDBFF /* DataController+Extension.swift */,
 				1E8B04141D94706C00E20A44 /* Model.swift */,
 			);
 			name = DataModel;
@@ -190,6 +193,7 @@
 				1E58FF051D98681200ED255E /* SharedErrorHandeling.swift in Sources */,
 				1E946C6F1D99F36B008CDBFF /* DetailPhotos+Extensions.swift in Sources */,
 				1E8B04131D94550A00E20A44 /* DataController.swift in Sources */,
+				1E946C711D9B2B3D008CDBFF /* DataController+Extension.swift in Sources */,
 				1E8B04011D944F6900E20A44 /* AppDelegate.swift in Sources */,
 				1E58FF0C1D98906800ED255E /* DetailCell.swift in Sources */,
 				1E8B04151D94706C00E20A44 /* Model.swift in Sources */,
