@@ -142,6 +142,16 @@ class NetworkOperation: Operation, URLSessionDataDelegate {
 //MARK: -  Connection
 
 enum APIConstants {
+    static var flickrAPIKey:String {
+    
+    guard let path = Bundle.main.path(forResource: "SecretAPIKeys", ofType: "plist"),
+        let nsarray = NSArray(contentsOfFile: path),
+        let array = nsarray as? Array<String>,
+        let key = array.first
+        else { fatalError("Please add SecretAPIKeys.plist to project, make it an array plist and add FLICKR api key as the first item of string array or remove plist file from xcode and just add your key to flickrAPIKey contant ")}
+    return key
+    
+    }
     static let lorempixel = "https://loremflickr.com/320/240"
 }
 
