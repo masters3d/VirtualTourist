@@ -87,10 +87,21 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         }
     }
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.dataSource = self
         collectionView.delegate = self
+//        let flickrSuccessBlock: (Data?) -> Void = { (data) in
+//            guard let data = data, let json = try? JSONSerialization.jsonObject(with: data, options: .mutableLeaves),
+//                let dict = json as? Dictionary<String, Any>, let photos = dict["photos"] as? Dictionary<String, Any>,
+//                let photoArray = photos["photo"] as? [Dictionary<String, Any>]
+//                else { return }
+//            print(photoArray)
+//        }
+//        
+//        NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: flickrSuccessBlock)
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -128,9 +139,12 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         
         if photoObject.isImagePlaceholder {
             cell.activityIndicatorStart()
-            let block = dataCache.createSuccessBlock(forCell: cell, forIndexPath: indexPath, withPin: pin)
-            let networkRequest = NetworkOperation(typeOfConnection: .lorempixel, delegate: self, successBlock: block, showActivityOnUI: false)
-            networkRequest.start()
+//            let block = dataCache.createSuccessBlock(forCell: cell, forIndexPath: indexPath, withPin: pin)
+//            let networkRequest = NetworkOperation(typeOfConnection: .lorempixel, delegate: self, successBlock: block, showActivityOnUI: false)
+//            networkRequest.start()
+
+        let block = dataCache.createSuccessBlockForRandomPicAtPin(forCell: cell, delegate: self, forIndexPath: indexPath, withPin: pin)
+        NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
             
         } else {
             cell.activityIndicatorStop()

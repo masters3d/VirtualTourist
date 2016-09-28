@@ -82,7 +82,7 @@ class NetworkOperation: Operation, URLSessionDataDelegate {
         }
     }
 
-   fileprivate init(url: URL, keyForData: String) {
+    init(url: URL, keyForData: String) {
         super.init()
         self.url = url
         self.keyString = keyForData
@@ -139,35 +139,8 @@ class NetworkOperation: Operation, URLSessionDataDelegate {
     }
 }
 
-//MARK: -  Connection
-
-enum APIConstants {
-    static var flickrAPIKey:String {
-    
-    guard let path = Bundle.main.path(forResource: "SecretAPIKeys", ofType: "plist"),
-        let nsarray = NSArray(contentsOfFile: path),
-        let array = nsarray as? Array<String>,
-        let key = array.first
-        else { fatalError("Please add SecretAPIKeys.plist to project, make it an array plist and add FLICKR api key as the first item of string array or remove plist file from xcode and just add your key to flickrAPIKey contant ")}
-    return key
-    
-    }
-    static let lorempixel = "https://loremflickr.com/320/240"
-}
-
-enum ConnectionType: String {
-    case lorempixel = "lorempixel"
-}
-
 extension NetworkOperation {
-    fileprivate convenience init(typeOfConnection: ConnectionType) {
-        switch typeOfConnection {
-        case .lorempixel:
-            self.init(url:URL(string: APIConstants.lorempixel)!, keyForData:typeOfConnection.rawValue)
-            request?.httpMethod = "GET"
-    }
-    }
-    
+
     internal convenience init(typeOfConnection: ConnectionType, delegate: ErrorReporting,
                     successBlock:@escaping (Data?)->Void = { _ in },
                     showActivityOnUI:Bool = true
@@ -195,9 +168,62 @@ extension NetworkOperation {
 }
 
 
+
 extension NetworkOperation {
 
     static func escapeForURL(_ input: String) -> String? {
         return input.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)
     }
+    
+   private static func parameterFromDict(_ dict:[String : Any]) -> [URLQueryItem] {
+        var result = [URLQueryItem]()
+        for each in dict {
+            let item = URLQueryItem(name: each.key, value: String(describing: each.value))
+            result.append(item)
+        }
+        return result
+    }
+    
+    static func componentsMaker(baseUrl:String, querryKeyValue:[String : Any] )-> URLComponents? {
+        var components = URLComponents.init(string: baseUrl)!
+        components.queryItems = parameterFromDict(querryKeyValue)
+        return components
+    }
 }
+
+
+//MARK: -  CONFIGURATION FLICKR CLIENT
+
+enum ConnectionType {
+    case lorempixel
+    case flickrRandomAroundPin(bbox:BBox, page:Int )
+    case getOneFlickrImage(url:String)
+    
+    var stringValue:String {
+        switch self {
+        case .lorempixel: return "lorempixel"
+        case .flickrRandomAroundPin(let payload) : return "flickrRandomAroundPin\(payload.bbox.shortDescription)Page\(payload.page)"
+        case .getOneFlickrImage(let payload) : return "getOneFlickrImage \(payload.components(separatedBy: "/").last ?? "")"
+        }
+    }
+}
+
+extension NetworkOperation {
+    fileprivate convenience init(typeOfConnection: ConnectionType) {
+        switch typeOfConnection {
+        case .lorempixel:
+            self.init(url:URL(string: APIConstants.lorempixel)!, keyForData:typeOfConnection.stringValue)
+            
+        case .flickrRandomAroundPin(let payload):
+            let querryDict:[String:Any] = ["extras": "url_m", "safe_search": 1, "bbox": payload.bbox.boundingBox, "api_key": APIConstants.flickrAPIKey, "method": "flickr.photos.search", "per_page": 250, "format": "json", "nojsoncallback": 1]
+            guard  let compotentsForUrl = NetworkOperation.componentsMaker(baseUrl:APIConstants.flickrBaseUrl, querryKeyValue: querryDict), let url = compotentsForUrl.url else { fatalError("Malform URL") }
+
+            self.init(url: url, keyForData:typeOfConnection.stringValue)
+        case .getOneFlickrImage(let url) :
+            self.init(url:URL(string: url)!,keyForData:typeOfConnection.stringValue)
+        }
+    }
+}
+
+
+

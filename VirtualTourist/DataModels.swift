@@ -20,7 +20,6 @@ class Pin:NSObject, MKAnnotation {
         self.title = title
         self.coordinate = coordinate
     }
-
 }
 
 final class Photo {

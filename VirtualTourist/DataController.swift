@@ -16,7 +16,7 @@ class DataController {
         let image = #imageLiteral(resourceName: "Placeholder")
         let data = UIImagePNGRepresentation(image)
         let tempPhoto = Photo(height: Double(image.size.height), imageData: data!, title: "none given", width: Double(image.size.height))
-        photos[pin] = Array(repeatElement(tempPhoto, count: 9))
+        photos[pin] = Array(repeatElement(tempPhoto, count: APIConstants.albumSize))
         return photos[pin] ?? []
     }
     
