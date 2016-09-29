@@ -19,8 +19,23 @@ func createSuccessBlockForRandomPicAtPin(forCell cell: DetailCell, delegate:Erro
             let photoArray = photos["photo"] as? [Dictionary<String, Any>]
             else {print("error parsing at \(#line) \(#file)"); return}
         
-        let randomImageDictionary = photoArray[randomNumberFrom1To(photoArray.count-1)]
-        
+            guard !photoArray.isEmpty else {
+                self.set(photos: [], for: pin)
+                
+                DispatchQueue.main.async(execute: {
+                   guard let detailViewController = delegate as? DetailPhotosViewController
+                        else { print("Casting failed for DetailPhotosViewController "); return }
+                    detailViewController.collectionView.reloadData()
+                    
+                    })
+                                return
+            }
+        var randomImageDictionary:[String : Any]
+        if photoArray.count > 1 {
+             randomImageDictionary = photoArray[randomNumberFrom1To(photoArray.count-1)]
+        } else {
+             randomImageDictionary = photoArray[0]
+        }
         guard let imageURL = randomImageDictionary["url_m"] as? String  else {print("ERROR: \(#line) \(#file)"); return}
         
         let sucessBlock = { (imageData:Data?) in

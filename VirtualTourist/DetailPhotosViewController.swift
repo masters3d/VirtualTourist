@@ -132,6 +132,18 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DetailCellReusableID", for: indexPath) as! DetailCell
+        
+        updateNoImageLabel()
+        
+        guard !dataCache.getPhotos(for: pin).isEmpty else {
+            self.collectionView.performBatchUpdates({
+                self.collectionView.reloadSections(IndexSet(integer: 0))
+                self.collectionView.reloadItems(at: self.collectionView.indexPathsForVisibleItems)
+                }, completion: { (success) in
+            })
+        
+            return cell
+        }
         let photoObject =
             dataCache.getPhotos(for: pin)[indexPath.row]
         
