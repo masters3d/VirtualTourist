@@ -25,14 +25,36 @@ class PinAnnotation: NSObject, MKAnnotation {
 //     Core Data Pin
     private let pinManagedObject = NSEntityDescription.insertNewObject(forEntityName: "Pin", into:  CoreDataStack.shared.viewContext) as! Pin
     
+    var returnedFromCoreDataPin:Pin? = nil
+    // Returns a new pin if none set in returnedFromCoreDataPin
     var coreDataPin:Pin {
-        pinManagedObject.longitude = coordinate.longitude
-        pinManagedObject.latitude = coordinate.latitude
-        return pinManagedObject
-    }
+        
+        defer {
+            //TODO:- We should probably do the saving on the Data Controller instead.
+        //CoreDataStack.shared.saveContext()
+                }
+        
+        if let pin = returnedFromCoreDataPin {
+            pin.longitude = coordinate.longitude
+            pin.latitude = coordinate.latitude
+            return pin
+        } else {
+            pinManagedObject.longitude = coordinate.longitude
+            pinManagedObject.latitude = coordinate.latitude
+            return pinManagedObject
 
-    
+        }
+    }
 }
+
+extension PinAnnotation {
+    
+    convenience init(coreDataPin: Pin) {
+        self.init(coordinate:CLLocationCoordinate2D.init(latitude: coreDataPin.latitude, longitude: coreDataPin.longitude) )
+        self.returnedFromCoreDataPin = coreDataPin
+    }
+}
+
 // Core Data
 @objc(Pin)
 class Pin:NSManagedObject {}
@@ -59,25 +81,11 @@ class Photo: NSManagedObject {
         }
     }
     
-//    convenience init(height: Double, imageData: Data, title: String, width: Double, photo_id:String = "",context:NSManagedObjectContext = DataController.contextProducer()  ) {
-//       guard let entity = NSEntityDescription.entity(forEntityName: "Photo", in: context) else { fatalError("Could not find Entity Photo") }
-//        self.init(entity: entity, insertInto: context)
-//        
-//        DispatchQueue.main.async(execute: {
-//        self.height = height
-//        self.imageData = imageData as NSData?
-//        self.title = title
-//        self.width = width
-//        self.photo_id = photo_id
-//        })
-//
-//}
-    
 }
 
 extension Photo {
     
-    static func coreDataObject(height: Double, imageData: Data, title: String, width: Double, photo_id:String = "", pin:PinAnnotation) -> Photo {
+    static func coreDataObject(height: Double, imageData: Data, title: String, width: Double, photo_id:String, pin:PinAnnotation, timeCreated:Date = Date()) -> Photo {
         let photo = NSEntityDescription.insertNewObject(forEntityName: "Photo", into:  CoreDataStack.shared.viewContext) as! Photo
         photo.title = title
         photo.height = height
@@ -85,20 +93,10 @@ extension Photo {
         photo.width = width
         photo.photo_id = photo_id
         photo.pin = pin.coreDataPin
+        photo.timeCreated = timeCreated as NSDate
+        //TODO:- We should probably do the saving on the Data Controller instead.
+//        if saveCoreData { CoreDataStack.shared.saveContext() }
         return photo
     }
-    
-    func coreDataObjectEditing(height: Double, imageData: Data, title: String, width: Double, photo_id:String = "") -> Photo {
-        
-        let edited = self
-        edited.title = title
-        edited.height = height
-        edited.imageData = imageData as NSData?
-        edited.width = width
-        edited.photo_id = photo_id
-        
-        return edited
-    }
-    
     
 }

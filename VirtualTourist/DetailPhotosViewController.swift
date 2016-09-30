@@ -54,9 +54,9 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         
         collectionView.performBatchUpdates({
             if buttonTitle == Constants.removeSelected {
-                var photos = self.dataCache.getPhotos(for: self.pin)
+                let allPhotos = self.dataCache.getPhotos(for: self.pin)
                 let indexes = self.selectedIndex.map{$0.row}
-                photos = photos.removingObjects(atIndexes: indexes)
+                let photosToRemove = indexes.map{allPhotos[$0]}
                 
                 // resetting the selection because the cell objects are reused
                 for each in self.selectedIndex {
@@ -66,11 +66,11 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
                 
                 self.collectionView.deleteItems(at: Array(self.selectedIndex))
                 self.selectedIndex.removeAll()
-                self.dataCache.set(photos: photos, for: self.pin)
+                self.dataCache.removePhotos(photosToRemove, for: self.pin)
                 
             } else {
-                let photos = self.dataCache.getPhotos(for: self.pin, newSet: true)
-                self.dataCache.set(photos: photos, for: self.pin)
+                //TODO: this adds photos to core data
+                let _ = self.dataCache.getPhotos(for: self.pin, newSet: true)
                 self.collectionView.reloadSections(IndexSet(integer: 0))
             }
             }, completion: { success in
@@ -92,15 +92,6 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         super.viewDidLoad()
         collectionView.dataSource = self
         collectionView.delegate = self
-//        let flickrSuccessBlock: (Data?) -> Void = { (data) in
-//            guard let data = data, let json = try? JSONSerialization.jsonObject(with: data, options: .mutableLeaves),
-//                let dict = json as? Dictionary<String, Any>, let photos = dict["photos"] as? Dictionary<String, Any>,
-//                let photoArray = photos["photo"] as? [Dictionary<String, Any>]
-//                else { return }
-//            print(photoArray)
-//        }
-//        
-//        NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: flickrSuccessBlock)
         
     }
     
@@ -151,11 +142,8 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         
         if photoObject.isImagePlaceholder {
             cell.activityIndicatorStart()
-//            let block = dataCache.createSuccessBlock(forCell: cell, forIndexPath: indexPath, withPin: pin)
-//            let networkRequest = NetworkOperation(typeOfConnection: .lorempixel, delegate: self, successBlock: block, showActivityOnUI: false)
-//            networkRequest.start()
-
-        let block = dataCache.createSuccessBlockForRandomPicAtPin(forCell: cell, delegate: self, forIndexPath: indexPath, withPin: pin)
+        
+        let block = dataCache.createSuccessBlockForRandomPicAtPin(forCell: cell, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
         NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
             
         } else {

@@ -25,6 +25,10 @@ class MapViewController: UIViewController, ErrorReporting {
         mapView.addGestureRecognizer( UILongPressGestureRecognizer(
             target: self, action: #selector(longPressDetected(_:)))
             )
+        // add pins from data store
+        DataController.dataController.getAllPins().forEach { (pin) in
+            mapView.addAnnotation(pin)
+        }
     }
     
     func longPressDetected(_ gesture: UIGestureRecognizer) {
@@ -45,7 +49,10 @@ class MapViewController: UIViewController, ErrorReporting {
     
     func addPin(_ pin:PinAnnotation) {
         mapView.addAnnotation(pin)
-        let _ =  DataController.dataController.getPhotos(for: pin)
+        if DataController.dataController.getPhotos(for: pin).isEmpty {
+         let _ =  DataController.dataController.getPhotos(for: pin, newSet: true)
+        }
+        
     }
     
     func removePin(_ pin:PinAnnotation) {

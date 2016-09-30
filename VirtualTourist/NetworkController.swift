@@ -9,15 +9,6 @@
 import UIKit
 import Swift
 
-extension Array {
-
-func removingObjects(atIndexes: [Int]) -> Array {
-    return self.enumerated()
-    .filter { !atIndexes.contains($0.offset) }
-    .map { $0.element }
-}
-}
-
 class NetworkOperation: Operation, URLSessionDataDelegate {
     //Error Reporting
     var delegate: ErrorReporting?
@@ -215,7 +206,7 @@ extension NetworkOperation {
             self.init(url:URL(string: APIConstants.lorempixel)!, keyForData:typeOfConnection.stringValue)
             
         case .flickrRandomAroundPin(let payload):
-            let querryDict:[String:Any] = ["extras": "url_m", "safe_search": 1, "bbox": payload.bbox.boundingBox, "api_key": APIConstants.flickrAPIKey, "method": "flickr.photos.search", "per_page": 250, "format": "json", "nojsoncallback": 1]
+            let querryDict:[String:Any] = ["extras": "url_s", "safe_search": 1, "bbox": payload.bbox.boundingBox, "api_key": APIConstants.flickrAPIKey, "method": "flickr.photos.search", "per_page": 250, "format": "json", "nojsoncallback": 1]
             guard  let compotentsForUrl = NetworkOperation.componentsMaker(baseUrl:APIConstants.flickrBaseUrl, querryKeyValue: querryDict), let url = compotentsForUrl.url else { fatalError("Malform URL") }
 
             self.init(url: url, keyForData:typeOfConnection.stringValue)

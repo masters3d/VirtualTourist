@@ -9,6 +9,52 @@
 import UIKit
 import CoreData
 
+/*
+    let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
+        fetchRequest.sortDescriptors =  [NSSortDescriptor(key:"latitude", ascending: true)]
+
+    let frc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: CoreDataStack.shared.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+    try! frc.performFetch()
+    print(frc.fetchedObjects)
+*/
+
+extension DataController {
+
+   fileprivate func coreDataPinFetchAll() -> [Pin] {
+    var results = [Pin]()
+
+        let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
+        fetchRequest.sortDescriptors =  [NSSortDescriptor(key:"latitude", ascending: true)]
+        
+        let frc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: CoreDataStack.shared.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+       guard  let _ = try? frc.performFetch() else { return []}
+        guard let objects = frc.fetchedObjects else { return [] }
+            results = objects
+        
+        return results
+    }
+    
+
+    fileprivate func coreDataPhotosFetchForPin(_ pin:Pin) -> [Photo]? {
+    var results = [Photo]()
+        let allPins = self.coreDataPinFetchAll()
+        if let indexOfPin = allPins.index(of: pin),
+            let photosSet = allPins[indexOfPin].photos,
+            let photos = photosSet as? Set<Photo> {
+            
+           results = Array(photos).sorted(by: { (left, right) -> Bool in
+           guard let lTime = left.timeCreated,
+           let rTime = right.timeCreated else { return false}
+           
+               return lTime.timeIntervalSince1970 < rTime.timeIntervalSince1970
+            })
+        } else {
+            results = []
+        }
+    
+    return results
+    }
+}
 
 class DataController {
 
@@ -16,49 +62,76 @@ class DataController {
         return (UIApplication.shared.delegate as! AppDelegate).dataController
     }
     
-    static func contextProducer() -> NSManagedObjectContext {
-        return DataController.dataController.coreData.viewContext
-    }
-
-    internal let coreData = CoreDataStack.shared
-    
-    private var photos = [PinAnnotation : [Photo]]()
-    
-    private func getNewPhotos(for pin:PinAnnotation) -> [Photo] {
+    private func getPlaceHolderPhotos(for pin:PinAnnotation) -> [Photo] {
         let image = #imageLiteral(resourceName: "Placeholder")
         let data = UIImagePNGRepresentation(image)
-        let tempPhoto = Photo.coreDataObject(height: Double(image.size.height), imageData: data!, title: "none given", width: Double(image.size.height), pin:pin)
-        photos[pin] = Array(repeatElement(tempPhoto, count: APIConstants.albumSize))
-        return photos[pin] ?? []
+        var photos = [Photo]()
+        
+        for each in 1...APIConstants.albumSize {
+            let photo_id = "\(pin.coordinate.shortDescription)PlaceHolder\(each)"
+            let eachPhoto =  Photo.coreDataObject(height: Double(image.size.height), imageData: data!, title: "none given", width: Double(image.size.height),photo_id:photo_id, pin:pin)
+            photos.append(eachPhoto)
+        }
+        return photos
     }
     
     func getPhotos(for pin:PinAnnotation, newSet:Bool = false) -> [Photo] {
-        if let result = photos[pin] {
-            return newSet ? getNewPhotos(for: pin) : result
+    var results = [Photo]()
+        if let result = self.coreDataPhotosFetchForPin(pin.coreDataPin) {
+            results = newSet ? self.getPlaceHolderPhotos(for: pin) : result
         } else {
-            return getNewPhotos(for: pin)
+            results = self.getPlaceHolderPhotos(for: pin)
         }
+    
+        return results
     }
     
-    func set(photos photosToAdd: [Photo], for pin:PinAnnotation) {
-        photos[pin] = photosToAdd
+    func getAllPins() -> [PinAnnotation] {
+    var result = [PinAnnotation]()
+        result = self.coreDataPinFetchAll().flatMap(PinAnnotation.init)
+    return result
     }
     
-    func setPhoto(_ photo:Photo, atIndex:Int, for pin:PinAnnotation) -> Bool {
-        if var array = photos[pin],
-            array.count != 0,
-            array.count > atIndex,
-            atIndex >= 0{
-            
-            array[atIndex] = photo
-            photos[pin] = array
-            return true
+    
+    //TODO:-Save CORE DATA
+    func addPhotos(_ photosToAdd: [Photo], to pin:PinAnnotation) {
+        photosToAdd.forEach { (eachPhoto) in
+            pin.coreDataPin.addToPhotos(eachPhoto)
         }
-        return false
+        CoreDataStack.shared.saveContext()
     }
     
+    func removeAllPhotos(for pin:PinAnnotation) {
+    
+       guard let photosToRemote = pin.coreDataPin.photos else {return}
+        pin.coreDataPin.removeFromPhotos(photosToRemote)
+       // CoreDataStack.shared.saveContext()
+    }
+    
+    func removePhotos(_ photosToRemove: [Photo], for pin:PinAnnotation) {
+        photosToRemove.forEach { (eachPhoto) in
+            pin.coreDataPin.removeFromPhotos(eachPhoto)
+        }
+        CoreDataStack.shared.saveContext()
+    }
+    
+
+    //TODO:-Save CORE DATA
+    // TODO:- change atINDEX to be NSManagerObejctID
+    func setNewPhoto(_ photo:Photo, forPhotoID:String, for pin:PinAnnotation) {
+       if let photosForPin = self.coreDataPhotosFetchForPin(pin.coreDataPin),
+        let photoToReplace = photosForPin.filter ({$0.photo_id == forPhotoID }).first{
+            photo.timeCreated = photoToReplace.timeCreated
+            pin.coreDataPin.addToPhotos(photo)
+            pin.coreDataPin.removeFromPhotos(photoToReplace)
+       }
+        CoreDataStack.shared.saveContext()
+    }
+    //TODO:-Save CORE DAT
     func remove(_ pin:PinAnnotation) {
-        photos[pin] = nil
+        CoreDataStack.shared.viewContext.delete(pin.coreDataPin)
+        CoreDataStack.shared.saveContext()
+    
     }
     
     
