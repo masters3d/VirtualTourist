@@ -17,13 +17,13 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     var isAlertPresenting: Bool = false
     
     // Pin passed in from segue
-    var pin:Pin!
-    func setPinForMap(_ pin:Pin) {
+    var pin:PinAnnotation!
+    func setPinForMap(_ pin:PinAnnotation) {
         self.pin = pin
     }
     
     var dataCache:DataController {
-        return appDelegate.dataController
+        return DataController.dataController
     }
     
     @IBOutlet weak var noImagesLabel: UILabel!

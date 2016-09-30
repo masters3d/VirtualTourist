@@ -11,7 +11,7 @@ import UIKit
 
 extension DataController {
 
-func createSuccessBlockForRandomPicAtPin(forCell cell: DetailCell, delegate:ErrorReporting, forIndexPath indexPath:IndexPath, withPin pin: Pin) -> (Data?) -> (){
+func createSuccessBlockForRandomPicAtPin(forCell cell: DetailCell, delegate:ErrorReporting, forIndexPath indexPath:IndexPath, withPin pin: PinAnnotation) -> (Data?) -> (){
     let block = { (data:Data?) in
         
         guard let data = data, let json = try? JSONSerialization.jsonObject(with: data, options: .mutableLeaves),
@@ -20,6 +20,9 @@ func createSuccessBlockForRandomPicAtPin(forCell cell: DetailCell, delegate:Erro
             else {print("error parsing at \(#line) \(#file)"); return}
         
             guard !photoArray.isEmpty else {
+            
+                //TODO: In core data I should just delte the object instead of setting it here.
+                // feels too magical though
                 self.set(photos: [], for: pin)
                 
                 DispatchQueue.main.async(execute: {
@@ -37,14 +40,22 @@ func createSuccessBlockForRandomPicAtPin(forCell cell: DetailCell, delegate:Erro
              randomImageDictionary = photoArray[0]
         }
         guard let imageURL = randomImageDictionary["url_m"] as? String  else {print("ERROR: \(#line) \(#file)"); return}
-        
+        guard let title = randomImageDictionary["title"] as? String  else {print("ERROR: \(#line) \(#file)"); return}
+        guard let photo_id = randomImageDictionary["id"] as? String  else {print("ERROR: \(#line) \(#file)"); return}
+
         let sucessBlock = { (imageData:Data?) in
             if let data = imageData, let image = UIImage(data: data) {
                 DispatchQueue.main.async(execute: {
                     cell.imageView.image = image
                     cell.activityIndicatorStop()
-                    let photo = Photo(height: Double(image.size.height),
-                                      imageData: data, title: "", width: Double(image.size.width))
+                    
+                    //TODO:- Editing the photo reference should set it
+                    // Need to make a differeiciation here
+                    // we are just creating a new file here.
+                    let photo = Photo.coreDataObject(height: Double(image.size.height),
+                                      imageData: data, title: title, width: Double(image.size.width), photo_id: photo_id, pin:pin)
+
+
                     if self.setPhoto(photo, atIndex: indexPath.row, for: pin)
                     { } else {
                         print("*****There was an error setting photo")
@@ -61,14 +72,14 @@ func createSuccessBlockForRandomPicAtPin(forCell cell: DetailCell, delegate:Erro
     return block
 }
 
-func createSuccessBlockForSample(forCell cell: DetailCell, forIndexPath indexPath:IndexPath, withPin pin: Pin) -> (Data?) -> (){
+func createSuccessBlockForSample(forCell cell: DetailCell, forIndexPath indexPath:IndexPath, withPin pin: PinAnnotation) -> (Data?) -> (){
         let block = { (data:Data?) in
                 if let data = data, let image = UIImage(data: data) {
                     DispatchQueue.main.async(execute: {
                         cell.imageView.image = image
                         cell.activityIndicatorStop()
-                        let photo = Photo(height: Double(image.size.height),
-                                          imageData: data, title: "", width: Double(image.size.width))
+                        let photo = Photo.coreDataObject(height: Double(image.size.height),
+                                          imageData: data, title: "", width: Double(image.size.width), pin:pin)
                         if self.setPhoto(photo, atIndex: indexPath.row, for: pin)
                         { } else {
                             print("*****There was an error setting photo")

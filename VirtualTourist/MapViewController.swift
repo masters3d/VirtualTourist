@@ -36,21 +36,21 @@ class MapViewController: UIViewController, ErrorReporting {
             } else {
                 let point = gesture.location(in: self.mapView)
                 let coordinate = mapView.convert(point, toCoordinateFrom: mapView)
-                let annotation = Pin(coordinate: coordinate)
+                let annotation = PinAnnotation(coordinate: coordinate)
                 // add to map and data store
                 addPin(annotation)
             }
         }
     }
     
-    func addPin(_ pin:Pin) {
+    func addPin(_ pin:PinAnnotation) {
         mapView.addAnnotation(pin)
-        let _ =  appDelegate.dataController.getPhotos(for: pin)
+        let _ =  DataController.dataController.getPhotos(for: pin)
     }
     
-    func removePin(_ pin:Pin) {
+    func removePin(_ pin:PinAnnotation) {
         mapView.removeAnnotation(pin)
-        appDelegate.dataController.remove(pin)
+        DataController.dataController.remove(pin)
     }
 
     lazy var infoView: UILabel = self.infoViewCreator()
@@ -73,7 +73,7 @@ class MapViewController: UIViewController, ErrorReporting {
 
     // Pin to send to segue
     
-    var pin:Pin?
+    var pin:PinAnnotation?
 
 }
 
@@ -98,9 +98,9 @@ extension MapViewController: MKMapViewDelegate {
     // this removes anotation in select mode
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if isEditing {
-            removePin(view.annotation as! Pin)
+            removePin(view.annotation as! PinAnnotation)
         } else {
-           pin = view.annotation as? Pin
+           pin = view.annotation as? PinAnnotation
         self.performSegue(withIdentifier: "showPhotoDetail", sender: self)
         }
     }

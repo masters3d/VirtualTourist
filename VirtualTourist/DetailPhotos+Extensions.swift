@@ -22,7 +22,7 @@ extension UIColor {
 
 extension DetailPhotosViewController {
     
-    func setMap(_ map:MKMapView ,with pin:Pin) {
+    func setMap(_ map:MKMapView ,with pin:PinAnnotation) {
         let span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
         let region = MKCoordinateRegionMake(pin.coordinate, span)
         map.setRegion(region, animated: true)
