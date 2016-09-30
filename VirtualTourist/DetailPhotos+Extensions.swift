@@ -10,10 +10,8 @@ import UIKit
 import MapKit
 
 enum Constants {
-    
     static var newCollection:String { return "New Collection" }
     static var removeSelected:String { return "Remove Selected Pictures" }
-    
 }
 
 extension UIColor {
@@ -21,7 +19,6 @@ extension UIColor {
 }
 
 extension DetailPhotosViewController {
-    
     func setMap(_ map:MKMapView ,with pin:PinAnnotation) {
         let span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
         let region = MKCoordinateRegionMake(pin.coordinate, span)
@@ -34,7 +31,5 @@ extension DetailPhotosViewController {
         let width = collection.frame.width / 3
         let layout = collection.collectionViewLayout as! UICollectionViewFlowLayout
         layout.itemSize = CGSize(width: width, height: width)
-        
     }
-    
 }

@@ -56,13 +56,10 @@ func randomNumberFrom1To(_ to:Int) -> Int {
 
 extension NetworkOperation {
 
-    
     static func flickrRandomAroundPinClient(pin:PinAnnotation, delegate: ErrorReporting, successBlock:@escaping (Data?)->Void){
         
         let pageBlock:((Data?)->Void) = {
             data in
-            
-        
             guard let data = data, let json = try? JSONSerialization.jsonObject(with: data, options: .mutableLeaves) else {print("error parsing at \(#line) \(#file)"); return}
              guard  let dict = json as? Dictionary<String, Any> else {print("error parsing at \(#line) \(#file)"); return}
             guard let photos = dict["photos"] as? Dictionary<String, Any> else {print("error parsing at \(#line) \(#file)"); return}
@@ -86,23 +83,3 @@ extension NetworkOperation {
         networkRequestPage.start()
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

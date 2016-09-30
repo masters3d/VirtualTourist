@@ -13,7 +13,6 @@ class DetailCell: UICollectionViewCell {
     @IBOutlet weak var imageView: UIImageView!
 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    
 }
 
 extension DetailCell:ActivityReporting {
@@ -22,13 +21,13 @@ extension DetailCell:ActivityReporting {
         DispatchQueue.main.async(execute: {
             [weak self] in
            self?.activityIndicator.startAnimating()
-            print("DetailView Activity Start")
+//            print("DetailView Activity Start")
         })}
     func activityIndicatorStop() {
         DispatchQueue.main.async(execute: {
             [weak self] in
            self?.activityIndicator.stopAnimating()
-            print("DetailView Activity Stop")
+//            print("DetailView Activity Stop")
         })}
 }
 

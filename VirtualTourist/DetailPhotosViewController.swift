@@ -69,7 +69,8 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
                 self.dataCache.removePhotos(photosToRemove, for: self.pin)
                 
             } else {
-                //TODO: this adds photos to core data
+                //this adds place holder photos to coreData
+                self.dataCache.removeAllPhotos(for: self.pin)
                 let _ = self.dataCache.getPhotos(for: self.pin, newSet: true)
                 self.collectionView.reloadSections(IndexSet(integer: 0))
             }

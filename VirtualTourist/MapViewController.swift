@@ -34,9 +34,7 @@ class MapViewController: UIViewController, ErrorReporting {
     func longPressDetected(_ gesture: UIGestureRecognizer) {
         if gesture.state == .began {
             if isEditing {
-                //TODO:-
-                print("need to implement this")
-                print(mapView.selectedAnnotations)
+                //TODO:- We could add a message about usability here
             } else {
                 let point = gesture.location(in: self.mapView)
                 let coordinate = mapView.convert(point, toCoordinateFrom: mapView)

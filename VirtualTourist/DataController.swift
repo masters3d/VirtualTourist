@@ -82,7 +82,6 @@ class DataController {
         } else {
             results = self.getPlaceHolderPhotos(for: pin)
         }
-    
         return results
     }
     
@@ -92,8 +91,6 @@ class DataController {
     return result
     }
     
-    
-    //TODO:-Save CORE DATA
     func addPhotos(_ photosToAdd: [Photo], to pin:PinAnnotation) {
         photosToAdd.forEach { (eachPhoto) in
             pin.coreDataPin.addToPhotos(eachPhoto)
@@ -105,7 +102,7 @@ class DataController {
     
        guard let photosToRemote = pin.coreDataPin.photos else {return}
         pin.coreDataPin.removeFromPhotos(photosToRemote)
-       // CoreDataStack.shared.saveContext()
+        // Saving the context here confusess collection view
     }
     
     func removePhotos(_ photosToRemove: [Photo], for pin:PinAnnotation) {
@@ -115,9 +112,6 @@ class DataController {
         CoreDataStack.shared.saveContext()
     }
     
-
-    //TODO:-Save CORE DATA
-    // TODO:- change atINDEX to be NSManagerObejctID
     func setNewPhoto(_ photo:Photo, forPhotoID:String, for pin:PinAnnotation) {
        if let photosForPin = self.coreDataPhotosFetchForPin(pin.coreDataPin),
         let photoToReplace = photosForPin.filter ({$0.photo_id == forPhotoID }).first{
@@ -127,7 +121,6 @@ class DataController {
        }
         CoreDataStack.shared.saveContext()
     }
-    //TODO:-Save CORE DAT
     func remove(_ pin:PinAnnotation) {
         CoreDataStack.shared.viewContext.delete(pin.coreDataPin)
         CoreDataStack.shared.saveContext()

@@ -47,21 +47,16 @@ func createSuccessBlockForRandomPicAtPin(forCell cell: DetailCell, delegate:Erro
                     cell.imageView.image = image
                     cell.activityIndicatorStop()
                     
-                    //TODO:- Editing the photo reference should set it
-                    // Need to make a differeiciation here
-                    // we are just creating a new file here.
                     let photo = Photo.coreDataObject(height: Double(image.size.height),
                                       imageData: data, title: title, width: Double(image.size.width), photo_id: photo_id, pin:pin)
 
                     self.setNewPhoto(photo, forPhotoID: photoId, for: pin)
-                    // self.setPhoto(photo, atIndex: indexPath.row, for: pin)
                 })
             }
         }
         
         let imageNetworkRequest = NetworkOperation(typeOfConnection: ConnectionType.getOneFlickrImage(url: imageURL), delegate: delegate, successBlock: sucessBlock, showActivityOnUI: false)
         imageNetworkRequest.start()
-        
     }
 
     return block

@@ -26,13 +26,9 @@ class PinAnnotation: NSObject, MKAnnotation {
     private let pinManagedObject = NSEntityDescription.insertNewObject(forEntityName: "Pin", into:  CoreDataStack.shared.viewContext) as! Pin
     
     var returnedFromCoreDataPin:Pin? = nil
+    
     // Returns a new pin if none set in returnedFromCoreDataPin
     var coreDataPin:Pin {
-        
-        defer {
-            //TODO:- We should probably do the saving on the Data Controller instead.
-        //CoreDataStack.shared.saveContext()
-                }
         
         if let pin = returnedFromCoreDataPin {
             pin.longitude = coordinate.longitude
@@ -42,7 +38,6 @@ class PinAnnotation: NSObject, MKAnnotation {
             pinManagedObject.longitude = coordinate.longitude
             pinManagedObject.latitude = coordinate.latitude
             return pinManagedObject
-
         }
     }
 }
@@ -61,17 +56,7 @@ class Pin:NSManagedObject {}
 
 @objc(Photo)
 class Photo: NSManagedObject {
-//    var title: String
-//    var height: Double
-//    var width: Double
-//    var imageData: Data
-//    var photo_id:String
-
-    // path
-    // pin
-    
     var image:UIImage? { return UIImage(data: imageData as! Data) }
-    
     var isImagePlaceholder:Bool {
         if let image = image {
             let placeholder = #imageLiteral(resourceName: "Placeholder")
@@ -80,11 +65,9 @@ class Photo: NSManagedObject {
             return false
         }
     }
-    
 }
 
 extension Photo {
-    
     static func coreDataObject(height: Double, imageData: Data, title: String, width: Double, photo_id:String, pin:PinAnnotation, timeCreated:Date = Date()) -> Photo {
         let photo = NSEntityDescription.insertNewObject(forEntityName: "Photo", into:  CoreDataStack.shared.viewContext) as! Photo
         photo.title = title
@@ -94,9 +77,6 @@ extension Photo {
         photo.photo_id = photo_id
         photo.pin = pin.coreDataPin
         photo.timeCreated = timeCreated as NSDate
-        //TODO:- We should probably do the saving on the Data Controller instead.
-//        if saveCoreData { CoreDataStack.shared.saveContext() }
         return photo
     }
-    
 }
