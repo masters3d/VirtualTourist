@@ -38,14 +38,14 @@ enum APIConstants {
 
     static let flickrBaseUrl = "https://api.flickr.com/services/rest"
     
-    static var flickrAPIKey:String {
+    static var flickrAPIKey:String = {
         guard let path = Bundle.main.path(forResource: "SecretAPIKeys", ofType: "plist"),
             let nsarray = NSArray(contentsOfFile: path),
             let array = nsarray as? Array<String>,
             let key = array.first
             else { fatalError("Flickr API key not included. Please overide the APIConstants.flickrAPIKey with your API key")}
         return key
-    }
+    }()
     // we used this for testing
     static let lorempixel = "https://loremflickr.com/320/240"
 }

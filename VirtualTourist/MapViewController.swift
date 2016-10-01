@@ -49,7 +49,8 @@ class MapViewController: UIViewController, ErrorReporting {
         mapView.addAnnotation(pin)
         if DataController.dataController.getPhotos(for: pin).isEmpty {
          let _ =  DataController.dataController.getPhotos(for: pin, newSet: true)
-        }
+       
+         }
         
     }
     
@@ -102,6 +103,10 @@ extension MapViewController: MKMapViewDelegate {
 
     // this removes anotation in select mode
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+    
+        // deselects the current pin
+        mapView.deselectAnnotation(view.annotation,animated:false)
+        
         if isEditing {
             removePin(view.annotation as! PinAnnotation)
         } else {

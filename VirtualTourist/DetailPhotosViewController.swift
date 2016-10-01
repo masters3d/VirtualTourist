@@ -93,7 +93,6 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         super.viewDidLoad()
         collectionView.dataSource = self
         collectionView.delegate = self
-        
     }
     
     override func viewDidLayoutSubviews() {
@@ -127,7 +126,9 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         
         updateNoImageLabel()
         
-        guard !dataCache.getPhotos(for: pin).isEmpty else {
+        let photos = dataCache.getPhotos(for: pin)
+        
+        guard !photos.isEmpty else {
             self.collectionView.performBatchUpdates({
                 self.collectionView.reloadSections(IndexSet(integer: 0))
                 self.collectionView.reloadItems(at: self.collectionView.indexPathsForVisibleItems)
@@ -136,8 +137,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         
             return cell
         }
-        let photoObject =
-            dataCache.getPhotos(for: pin)[indexPath.row]
+        let photoObject = photos[indexPath.row]
         
         cell.imageView.image = photoObject.image
         
@@ -153,6 +153,8 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         }
         return cell
     }
+    
+
 }
 
 

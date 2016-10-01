@@ -46,11 +46,10 @@ func createSuccessBlockForRandomPicAtPin(forCell cell: DetailCell, delegate:Erro
                 DispatchQueue.main.async(execute: {
                     cell.imageView.image = image
                     cell.activityIndicatorStop()
-                    
+
                 let blockToEditObj = Photo.coreDataEditObjectBlockCreator(height: Double(image.size.height),
                                       imageData: data, title: title, width: Double(image.size.width), photo_id: photo_id)
                 self.editPhoto(withPhotoId: photoId, for: pin, withBlock: blockToEditObj)
-
                 })
             }
         }

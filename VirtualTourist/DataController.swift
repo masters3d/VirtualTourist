@@ -71,6 +71,8 @@ class DataController {
             let photo_id = "\(pin.coordinate.shortDescription)PlaceHolder\(each)"
             let eachPhoto =  Photo.coreDataObject(height: Double(image.size.height), imageData: data!, title: "none given", width: Double(image.size.height),photo_id:photo_id, pin:pin)
             photos.append(eachPhoto)
+            // saving Core Data
+            CoreDataStack.shared.saveContext()
         }
         return photos
     }
@@ -100,16 +102,24 @@ class DataController {
     
     func removeAllPhotos(for pin:PinAnnotation) {
     
-       guard let photosToRemote = pin.coreDataPin.photos else {return}
-        pin.coreDataPin.removeFromPhotos(photosToRemote)
-        // Saving the context here confusess collection view
+       guard let photosToRemote = pin.coreDataPin.photos as? Set<Photo>else {return}
+        removePhotos(Array(photosToRemote), for: pin)
+        
     }
     
     func removePhotos(_ photosToRemove: [Photo], for pin:PinAnnotation) {
         photosToRemove.forEach { (eachPhoto) in
             pin.coreDataPin.removeFromPhotos(eachPhoto)
+            CoreDataStack.shared.viewContext.delete(eachPhoto)
         }
         CoreDataStack.shared.saveContext()
+    }
+    
+    func removePhoto(withPhotoId:String, for pin:PinAnnotation) ->Void {
+        if let photosForPin = self.coreDataPhotosFetchForPin(pin.coreDataPin),
+        let photoToRemove = photosForPin.filter ({$0.photo_id == withPhotoId }).first{
+            removePhotos([photoToRemove], for: pin)
+        }
     }
     
     func editPhoto(withPhotoId:String, for pin:PinAnnotation, withBlock:(Photo) ->Void) {
@@ -121,7 +131,9 @@ class DataController {
     }
     
     func remove(_ pin:PinAnnotation) {
+        removeAllPhotos(for: pin)
         CoreDataStack.shared.viewContext.delete(pin.coreDataPin)
+        CoreDataStack.shared.viewContext.delete(pin.pinManagedObject)
         CoreDataStack.shared.saveContext()
     
     }

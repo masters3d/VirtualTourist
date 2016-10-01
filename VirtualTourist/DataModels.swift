@@ -23,7 +23,7 @@ class PinAnnotation: NSObject, MKAnnotation {
     }
     
 //     Core Data Pin
-    private let pinManagedObject = NSEntityDescription.insertNewObject(forEntityName: "Pin", into:  CoreDataStack.shared.viewContext) as! Pin
+    lazy var pinManagedObject = NSEntityDescription.insertNewObject(forEntityName: "Pin", into:  CoreDataStack.shared.viewContext) as! Pin
     
     var returnedFromCoreDataPin:Pin? = nil
     
