@@ -79,4 +79,20 @@ extension Photo {
         photo.timeCreated = timeCreated as NSDate
         return photo
     }
+    
+    static func coreDataEditObjectBlockCreator(height: Double, imageData: Data, title: String, width: Double, photo_id:String) -> (Photo) -> Void {
+        
+        let block:(Photo) -> Void = {
+            photoToEdit in
+            photoToEdit.title = title
+            photoToEdit.height = height
+            photoToEdit.imageData = imageData as NSData?
+            photoToEdit.width = width
+            photoToEdit.photo_id = photo_id
+//            photoToEdit.pin = pin.coreDataPin
+//            photoToEdit.timeCreated = timeCreated as NSDate
+        }
+        return block
+    }
+    
 }

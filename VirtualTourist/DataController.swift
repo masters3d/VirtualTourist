@@ -112,15 +112,14 @@ class DataController {
         CoreDataStack.shared.saveContext()
     }
     
-    func setNewPhoto(_ photo:Photo, forPhotoID:String, for pin:PinAnnotation) {
-       if let photosForPin = self.coreDataPhotosFetchForPin(pin.coreDataPin),
-        let photoToReplace = photosForPin.filter ({$0.photo_id == forPhotoID }).first{
-            photo.timeCreated = photoToReplace.timeCreated
-            pin.coreDataPin.addToPhotos(photo)
-            pin.coreDataPin.removeFromPhotos(photoToReplace)
-       }
+    func editPhoto(withPhotoId:String, for pin:PinAnnotation, withBlock:(Photo) ->Void) {
+        if let photosForPin = self.coreDataPhotosFetchForPin(pin.coreDataPin),
+        let photoToEdit = photosForPin.filter ({$0.photo_id == withPhotoId }).first{
+            withBlock(photoToEdit)
+        }
         CoreDataStack.shared.saveContext()
     }
+    
     func remove(_ pin:PinAnnotation) {
         CoreDataStack.shared.viewContext.delete(pin.coreDataPin)
         CoreDataStack.shared.saveContext()
