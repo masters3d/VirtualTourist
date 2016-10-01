@@ -27,6 +27,7 @@ class MapViewController: UIViewController, ErrorReporting {
             )
         // add pins from data store
         DataController.dataController.getAllPins().forEach { (pin) in
+        
             mapView.addAnnotation(pin)
         }
     }
@@ -38,7 +39,7 @@ class MapViewController: UIViewController, ErrorReporting {
             } else {
                 let point = gesture.location(in: self.mapView)
                 let coordinate = mapView.convert(point, toCoordinateFrom: mapView)
-                let annotation = PinAnnotation(coordinate: coordinate)
+                let annotation = PinAnnotation.coreDataObject(coordinate: coordinate)
                 // add to map and data store
                 addPin(annotation)
             }

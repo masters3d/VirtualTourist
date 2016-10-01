@@ -79,7 +79,7 @@ class DataController {
     
     func getPhotos(for pin:PinAnnotation, newSet:Bool = false) -> [Photo] {
     var results = [Photo]()
-        if let result = self.coreDataPhotosFetchForPin(pin.coreDataPin) {
+        if let result = self.coreDataPhotosFetchForPin(pin) {
             results = newSet ? self.getPlaceHolderPhotos(for: pin) : result
         } else {
             results = self.getPlaceHolderPhotos(for: pin)
@@ -89,41 +89,42 @@ class DataController {
     
     func getAllPins() -> [PinAnnotation] {
     var result = [PinAnnotation]()
-        result = self.coreDataPinFetchAll().flatMap(PinAnnotation.init)
+        result = self.coreDataPinFetchAll()
+        
     return result
     }
     
     func addPhotos(_ photosToAdd: [Photo], to pin:PinAnnotation) {
         photosToAdd.forEach { (eachPhoto) in
-            pin.coreDataPin.addToPhotos(eachPhoto)
+            pin.addToPhotos(eachPhoto)
         }
         CoreDataStack.shared.saveContext()
     }
     
     func removeAllPhotos(for pin:PinAnnotation) {
     
-       guard let photosToRemote = pin.coreDataPin.photos as? Set<Photo>else {return}
+       guard let photosToRemote = pin.photos as? Set<Photo>else {return}
         removePhotos(Array(photosToRemote), for: pin)
         
     }
     
     func removePhotos(_ photosToRemove: [Photo], for pin:PinAnnotation) {
         photosToRemove.forEach { (eachPhoto) in
-            pin.coreDataPin.removeFromPhotos(eachPhoto)
+            pin.removeFromPhotos(eachPhoto)
             CoreDataStack.shared.viewContext.delete(eachPhoto)
         }
         CoreDataStack.shared.saveContext()
     }
     
     func removePhoto(withPhotoId:String, for pin:PinAnnotation) ->Void {
-        if let photosForPin = self.coreDataPhotosFetchForPin(pin.coreDataPin),
+        if let photosForPin = self.coreDataPhotosFetchForPin(pin),
         let photoToRemove = photosForPin.filter ({$0.photo_id == withPhotoId }).first{
             removePhotos([photoToRemove], for: pin)
         }
     }
     
     func editPhoto(withPhotoId:String, for pin:PinAnnotation, withBlock:(Photo) ->Void) {
-        if let photosForPin = self.coreDataPhotosFetchForPin(pin.coreDataPin),
+        if let photosForPin = self.coreDataPhotosFetchForPin(pin),
         let photoToEdit = photosForPin.filter ({$0.photo_id == withPhotoId }).first{
             withBlock(photoToEdit)
         }
@@ -132,8 +133,7 @@ class DataController {
     
     func remove(_ pin:PinAnnotation) {
         removeAllPhotos(for: pin)
-        CoreDataStack.shared.viewContext.delete(pin.coreDataPin)
-        CoreDataStack.shared.viewContext.delete(pin.pinManagedObject)
+        CoreDataStack.shared.viewContext.delete(pin)
         CoreDataStack.shared.saveContext()
     
     }

@@ -10,49 +10,26 @@ import Foundation
 import MapKit
 import CoreData
 
-@objc(PinAnnotation)
-class PinAnnotation: NSObject, MKAnnotation {
-    var title: String?
-    var subtitle: String?
-    var coordinate: CLLocationCoordinate2D = CLLocationCoordinate2D()
-    
-   init(title:String = "", subtitle: String = "", coordinate: CLLocationCoordinate2D){
-        self.subtitle = subtitle
-        self.title = title
-        self.coordinate = coordinate
-    }
-    
-//     Core Data Pin
-    lazy var pinManagedObject = NSEntityDescription.insertNewObject(forEntityName: "Pin", into:  CoreDataStack.shared.viewContext) as! Pin
-    
-    var returnedFromCoreDataPin:Pin? = nil
-    
-    // Returns a new pin if none set in returnedFromCoreDataPin
-    var coreDataPin:Pin {
-        
-        if let pin = returnedFromCoreDataPin {
-            pin.longitude = coordinate.longitude
-            pin.latitude = coordinate.latitude
-            return pin
-        } else {
-            pinManagedObject.longitude = coordinate.longitude
-            pinManagedObject.latitude = coordinate.latitude
-            return pinManagedObject
-        }
-    }
-}
-
-extension PinAnnotation {
-    
-    convenience init(coreDataPin: Pin) {
-        self.init(coordinate:CLLocationCoordinate2D.init(latitude: coreDataPin.latitude, longitude: coreDataPin.longitude) )
-        self.returnedFromCoreDataPin = coreDataPin
-    }
-}
+typealias PinAnnotation = Pin
 
 // Core Data
 @objc(Pin)
-class Pin:NSManagedObject {}
+class Pin:NSManagedObject,MKAnnotation {
+    var title: String? = ""
+    var subtitle: String? = ""
+    var coordinate: CLLocationCoordinate2D { return CLLocationCoordinate2D(latitude: latitude, longitude: longitude) }
+
+    static func coreDataObject(coordinate: CLLocationCoordinate2D) -> Pin {
+        let pin = NSEntityDescription.insertNewObject(forEntityName: "Pin", into:  CoreDataStack.shared.viewContext) as! Pin
+        pin.latitude = coordinate.latitude
+        pin.longitude = coordinate.longitude
+        return pin
+    }
+    
+    static func coreDataObject(latitude:Double,longitude:Double) -> Pin {
+        return coreDataObject(coordinate:CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+    }
+}
 
 @objc(Photo)
 class Photo: NSManagedObject {
@@ -75,7 +52,7 @@ extension Photo {
         photo.imageData = imageData as NSData?
         photo.width = width
         photo.photo_id = photo_id
-        photo.pin = pin.coreDataPin
+        photo.pin = pin
         photo.timeCreated = timeCreated as NSDate
         return photo
     }
