@@ -1,5 +1,6 @@
+This project uses CoreData, NSURLSession, NSOperation, MapKit and CollectionView. 
+
 ![https://j.gifs.com/Z65N78.gif](https://cloud.githubusercontent.com/assets/6539412/19018418/8b18172a-8814-11e6-961a-7004a65c3832.gif)
-![https://j.gifs.com/mZBWYR.gif](https://cloud.githubusercontent.com/assets/6539412/19018530/da18a9f2-8819-11e6-8766-42ccdc0ea546.gif)
 
 This project uses the flickr API to get pictures around a location. 
 
@@ -35,3 +36,4 @@ Replace the above code with
 </array>
 </plist>
 ```
+![https://j.gifs.com/mZBWYR.gif](https://cloud.githubusercontent.com/assets/6539412/19018530/da18a9f2-8819-11e6-8766-42ccdc0ea546.gif)
