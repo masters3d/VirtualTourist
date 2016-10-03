@@ -56,7 +56,7 @@ func randomNumberFrom1To(_ to:Int) -> Int {
 
 extension NetworkOperation {
 
-    static func flickrRandomAroundPinClient(pin:PinAnnotation, delegate: ErrorReporting, successBlock:@escaping (Data?)->Void){
+    static func flickrRandomAroundPinClient(pin:PinAnnotation, delegate: ErrorReporting, successBlock:@escaping (Data?)->Void) -> NetworkOperation {
         
         let pageBlock:((Data?)->Void) = {
             data in
@@ -80,6 +80,6 @@ extension NetworkOperation {
 
         let networkRequestPage = NetworkOperation.init(typeOfConnection: pageConnection, delegate: delegate, successBlock: pageBlock, showActivityOnUI: false)
         
-        networkRequestPage.start()
+       return networkRequestPage
     }
 }

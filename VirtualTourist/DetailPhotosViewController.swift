@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 
 class DetailPhotosViewController: UIViewController, ErrorReporting,
-    UICollectionViewDelegate, UICollectionViewDataSource  {
+    UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDataSourcePrefetching {
 
     // Error Reporting Protocol Requirements
     var errorReported: Error?
@@ -25,6 +25,13 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     var dataCache:DataController {
         return DataController.dataController
     }
+    
+    // Operation Que
+    let neworkOperationsQueue:OperationQueue = {
+            let queue = OperationQueue()
+            queue.maxConcurrentOperationCount = 2
+            return queue
+            }()
     
     @IBOutlet weak var noImagesLabel: UILabel!
 
@@ -68,6 +75,8 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
                 self.selectedIndex.removeAll()
                 self.dataCache.removePhotos(photosToRemove, for: self.pin)
                 
+                self.neworkOperationsQueue.cancelAllOperations()
+                
             } else {
                 //this adds place holder photos to coreData
                 self.dataCache.removeAllPhotos(for: self.pin)
@@ -93,6 +102,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         super.viewDidLoad()
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.prefetchDataSource = self
     }
     
     override func viewDidLayoutSubviews() {
@@ -123,11 +133,12 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DetailCellReusableID", for: indexPath) as! DetailCell
-        
+        print("operations-------------->\(neworkOperationsQueue.operations.count)")
+        print("max Operatios-------------->\(neworkOperationsQueue.maxConcurrentOperationCount)")
+
         updateNoImageLabel()
-        
         let photos = dataCache.getPhotos(for: pin)
-        
+
         guard !photos.isEmpty else {
             self.collectionView.performBatchUpdates({
                 self.collectionView.reloadSections(IndexSet(integer: 0))
@@ -137,22 +148,59 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         
             return cell
         }
+        
         let photoObject = photos[indexPath.row]
         
         cell.imageView.image = photoObject.image
         
-        if photoObject.isImagePlaceholder {
-            cell.activityIndicatorStart()
-        
-        let block = dataCache.createSuccessBlockForRandomPicAtPin(forCell: cell, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
-        NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
-            
-        } else {
+        guard photoObject.isImagePlaceholder else {
             cell.activityIndicatorStop()
-            
+            return cell
         }
+        
+        guard !neworkOperationsQueue.isOperationInQueue(named: photoObject.photo_id ?? "") else {
+            cell.activityIndicatorStart()
+            return cell
+        }
+        
+        // check if operation is already going
+        
+        let cellBlock:(UIImage?)->Void = { (image) in cell.imageView.image = image
+                        cell.activityIndicatorStop()
+                    }
+        
+        let block = dataCache.createSuccessBlockForRandomPicAtPin(forCellBlock: cellBlock, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
+        let operation = NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
+        operation.name = photoObject.photo_id
+        
+        neworkOperationsQueue.addOperation(operation)
+        
+        cell.activityIndicatorStart()
         return cell
     }
+
+    
+    // prefetching protocol
+    
+    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+        let indexes = indexPaths.map({$0.row})
+        let photoObjects = dataCache.getPhotos(for: pin).enumerated().filter({indexes.contains($0.offset)}).map{$0.element}
+        
+        for (indexPathofPhoto,photoObject) in zip(indexPaths,photoObjects){
+        
+            guard photoObject.isImagePlaceholder, !neworkOperationsQueue.isOperationInQueue(named: photoObject.photo_id ?? "") else { continue }
+            
+            let blockUpdateCell:(UIImage?)->Void = { _ in
+                    self.collectionView.reloadItems(at: [indexPathofPhoto])
+            }
+            
+            let block = dataCache.createSuccessBlockForRandomPicAtPin(forCellBlock: blockUpdateCell, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
+            let operation = NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
+            operation.name = photoObject.photo_id
+            neworkOperationsQueue.addOperation(operation)
+        }
+        
+}
     
 
 }

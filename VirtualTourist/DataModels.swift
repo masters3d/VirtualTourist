@@ -20,7 +20,8 @@ class Pin:NSManagedObject,MKAnnotation {
     var coordinate: CLLocationCoordinate2D { return CLLocationCoordinate2D(latitude: latitude, longitude: longitude) }
 
     static func coreDataObject(coordinate: CLLocationCoordinate2D) -> Pin {
-        let pin = NSEntityDescription.insertNewObject(forEntityName: "Pin", into:  CoreDataStack.shared.viewContext) as! Pin
+        //let pin = NSEntityDescription.insertNewObject(forEntityName: "Pin", into:  CoreDataStack.shared.viewContext) as! Pin
+        let pin = Pin(context:CoreDataStack.shared.viewContext)
         pin.latitude = coordinate.latitude
         pin.longitude = coordinate.longitude
         return pin

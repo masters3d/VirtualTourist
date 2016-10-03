@@ -11,7 +11,7 @@ import UIKit
 
 extension DataController {
 
-func createSuccessBlockForRandomPicAtPin(forCell cell: DetailCell, delegate:ErrorReporting, forPhotoID photoId:String, withPin pin: PinAnnotation) -> (Data?) -> (){
+func createSuccessBlockForRandomPicAtPin(forCellBlock cellBlock: @escaping (UIImage?)->Void, delegate:ErrorReporting, forPhotoID photoId:String, withPin pin: PinAnnotation) -> (Data?) -> (){
     let block = { (data:Data?) in
         
         guard let data = data, let json = try? JSONSerialization.jsonObject(with: data, options: .mutableLeaves),
@@ -44,12 +44,10 @@ func createSuccessBlockForRandomPicAtPin(forCell cell: DetailCell, delegate:Erro
         let sucessBlock = { (imageData:Data?) in
             if let data = imageData, let image = UIImage(data: data) {
                 DispatchQueue.main.async(execute: {
-                    cell.imageView.image = image
-                    cell.activityIndicatorStop()
-
                 let blockToEditObj = Photo.coreDataEditObjectBlockCreator(height: Double(image.size.height),
                                       imageData: data, title: title, width: Double(image.size.width), photo_id: photo_id)
                 self.editPhoto(withPhotoId: photoId, for: pin, withBlock: blockToEditObj)
+                cellBlock(image)
                 })
             }
         }

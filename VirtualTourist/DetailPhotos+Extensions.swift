@@ -9,6 +9,13 @@
 import UIKit
 import MapKit
 
+extension OperationQueue {
+    func isOperationInQueue(named:String) -> Bool {
+       guard let _ =  self.operations.map({$0.name}).flatMap({$0}).filter({$0 == named}).first else { return false }
+            return true
+    }
+}
+
 enum Constants {
     static var newCollection:String { return "New Collection" }
     static var removeSelected:String { return "Remove Selected Pictures" }
@@ -31,5 +38,6 @@ extension DetailPhotosViewController {
         let width = collection.frame.width / 3
         let layout = collection.collectionViewLayout as! UICollectionViewFlowLayout
         layout.itemSize = CGSize(width: width, height: width)
+//        layout.estimatedItemSize = UICollectionViewFlowLayoutAutomaticSize
     }
 }
