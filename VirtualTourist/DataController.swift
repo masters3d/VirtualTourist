@@ -60,6 +60,17 @@ class DataController {
 
     static var shared = DataController()
     
+    var errorHandlerDelegate:ErrorReporting? {didSet{
+    
+        guard let delegate = errorHandlerDelegate
+            else {
+                CoreDataStack.shared.errorHandler = {_ in }
+                return }
+        // isSucess
+        CoreDataStack.shared.errorHandler = delegate.reportErrorFromOperation
+    
+    }}
+    
     private func getPlaceHolderPhotos(for pin:PinAnnotation) -> [Photo] {
         let image = #imageLiteral(resourceName: "Placeholder")
         let data = UIImagePNGRepresentation(image)

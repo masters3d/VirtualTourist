@@ -11,13 +11,23 @@ import MapKit
 
 
 class MapViewController: UIViewController, ErrorReporting {
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        DataController.shared.errorHandlerDelegate = self
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        DataController.shared.errorHandlerDelegate = nil
+    }
+
     
     @IBOutlet weak var mapView: MKMapView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         mapView.delegate = self
-        
         // add the edit button on the right
         self.navigationItem.rightBarButtonItem = self.editButtonItem
         

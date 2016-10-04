@@ -16,6 +16,17 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     var errorReported: Error?
     var isAlertPresenting: Bool = false
     
+    // Error handeling for Data
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        DataController.shared.errorHandlerDelegate = self
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        DataController.shared.errorHandlerDelegate = nil
+    }
+    
     // Pin passed in from segue
     var pin:PinAnnotation!
     func setPinForMap(_ pin:PinAnnotation) {
