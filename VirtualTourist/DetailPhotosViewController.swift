@@ -22,10 +22,6 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         self.pin = pin
     }
     
-    var dataCache:DataController {
-        return DataController.dataController
-    }
-    
     @IBOutlet weak var noImagesLabel: UILabel!
 
     @IBOutlet weak var mapView: MKMapView!
@@ -54,7 +50,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         
         collectionView.performBatchUpdates({
             if buttonTitle == Constants.removeSelected {
-                let allPhotos = self.dataCache.getPhotos(for: self.pin)
+                let allPhotos = DataController.shared.getPhotos(for: self.pin)
                 let indexes = self.selectedIndex.map{$0.row}
                 let photosToRemove = indexes.map{allPhotos[$0]}
                 
@@ -66,7 +62,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
                 
                 self.collectionView.deleteItems(at: Array(self.selectedIndex))
                 self.selectedIndex.removeAll()
-                self.dataCache.removePhotos(photosToRemove, for: self.pin)
+                DataController.shared.removePhotos(photosToRemove, for: self.pin)
                 
                 // this cancell the current operations but each cell is able to added them back on.
                 self.pin.neworkOperationsQueue.cancelAllOperations()
@@ -77,17 +73,17 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
                 self.pin.neworkOperationsQueue.cancelAllOperations()
                 
                 //this adds place holder photos to coreData
-                self.dataCache.removeAllPhotos(for: self.pin)
+                DataController.shared.removeAllPhotos(for: self.pin)
                 
                 let pagesNumberRequest = NetworkOperation.flickrNumberOfPageforPin(self.pin, delegate: self)
                 self.pin.neworkOperationsQueue.addOperation(pagesNumberRequest)
                 
                 // sets temp photos on the pin
-                let photos =  DataController.dataController.getPhotos(for: self.pin, newSet: true)
+                let photos =  DataController.shared.getPhotos(for: self.pin, newSet: true)
                 
                 // start download of new photos
                 for each in photos {
-                    let block = DataController.dataController.createSuccessBlockForRandomPicAtPin(forCellBlock: {_ in return}, delegate: self, forPhotoID: each.photo_id!, withPin: self.pin)
+                    let block = DataController.shared.createSuccessBlockForRandomPicAtPin(forCellBlock: {_ in return}, delegate: self, forPhotoID: each.photo_id!, withPin: self.pin)
                     let operation = NetworkOperation.flickrRandomAroundPinClient(pin: self.pin, delegate: self, successBlock: block)
                     operation.name = each.photo_id
                     operation.addDependency(pagesNumberRequest)
@@ -103,7 +99,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
 
 
     func updateNoImageLabel(){
-        if self.dataCache.getPhotos(for: self.pin).isEmpty {
+        if DataController.shared.getPhotos(for: self.pin).isEmpty {
             self.noImagesLabel.isHidden = false
         } else {
             self.noImagesLabel.isHidden = true
@@ -129,7 +125,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         updateNoImageLabel()
-        return dataCache.getPhotos(for: pin).count
+       return DataController.shared.getPhotos(for: pin).count
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -150,7 +146,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         print("max Operatios-------------->\(self.pin.neworkOperationsQueue.maxConcurrentOperationCount)")
 
         updateNoImageLabel()
-        let photos = dataCache.getPhotos(for: pin)
+        let photos = DataController.shared.getPhotos(for: pin)
 
         guard !photos.isEmpty else {
             self.collectionView.performBatchUpdates({
@@ -182,7 +178,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
                         cell.activityIndicatorStop()
                     }
         
-        let block = dataCache.createSuccessBlockForRandomPicAtPin(forCellBlock: cellBlock, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
+        let block = DataController.shared.createSuccessBlockForRandomPicAtPin(forCellBlock: cellBlock, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
         let operation = NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
         operation.name = photoObject.photo_id
         
@@ -197,7 +193,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         let indexes = indexPaths.map({$0.row})
-        let photoObjects = dataCache.getPhotos(for: pin).enumerated().filter({indexes.contains($0.offset)}).map{$0.element}
+        let photoObjects = DataController.shared.getPhotos(for: pin).enumerated().filter({indexes.contains($0.offset)}).map{$0.element}
         
         for (indexPathofPhoto,photoObject) in zip(indexPaths,photoObjects){
         
@@ -210,7 +206,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
                     self.collectionView.reloadItems(at: [indexPathofPhoto])
             }
             
-            let block = dataCache.createSuccessBlockForRandomPicAtPin(forCellBlock: blockUpdateCell, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
+            let block = DataController.shared.createSuccessBlockForRandomPicAtPin(forCellBlock: blockUpdateCell, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
             let operation = NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
             operation.name = photoObject.photo_id
             self.pin.neworkOperationsQueue.addOperation(operation)

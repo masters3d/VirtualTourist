@@ -26,7 +26,7 @@ class MapViewController: UIViewController, ErrorReporting {
             target: self, action: #selector(longPressDetected(_:)))
             )
         // add pins from data store
-        DataController.dataController.getAllPins().forEach { (pin) in
+        DataController.shared.getAllPins().forEach { (pin) in
         
             mapView.addAnnotation(pin)
         }
@@ -52,13 +52,13 @@ class MapViewController: UIViewController, ErrorReporting {
         let pagesNumberRequest = NetworkOperation.flickrNumberOfPageforPin(pin, delegate: self)
         pin.neworkOperationsQueue.addOperation(pagesNumberRequest)
         
-        if DataController.dataController.getPhotos(for: pin).isEmpty {
+        if DataController.shared.getPhotos(for: pin).isEmpty {
          // sets temp photos on the pin
-         let photos =  DataController.dataController.getPhotos(for: pin, newSet: true)
+         let photos =  DataController.shared.getPhotos(for: pin, newSet: true)
          
          // start download of new photos
          for each in photos {
-            let block = DataController.dataController.createSuccessBlockForRandomPicAtPin(forCellBlock: {_ in return}, delegate: self, forPhotoID: each.photo_id!, withPin: pin)
+            let block = DataController.shared.createSuccessBlockForRandomPicAtPin(forCellBlock: {_ in return}, delegate: self, forPhotoID: each.photo_id!, withPin: pin)
             let operation = NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
             operation.name = each.photo_id
             operation.addDependency(pagesNumberRequest)
@@ -70,7 +70,7 @@ class MapViewController: UIViewController, ErrorReporting {
     
     func removePin(_ pin:PinAnnotation) {
         mapView.removeAnnotation(pin)
-        DataController.dataController.remove(pin)
+        DataController.shared.remove(pin)
     }
 
     lazy var infoView: UILabel = self.infoViewCreator()

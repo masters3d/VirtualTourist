@@ -58,9 +58,7 @@ extension DataController {
 
 class DataController {
 
-    static var dataController:DataController {
-        return (UIApplication.shared.delegate as! AppDelegate).dataController
-    }
+    static var shared = DataController()
     
     private func getPlaceHolderPhotos(for pin:PinAnnotation) -> [Photo] {
         let image = #imageLiteral(resourceName: "Placeholder")
