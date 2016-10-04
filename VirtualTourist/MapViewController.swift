@@ -12,7 +12,7 @@ import MapKit
 
 class MapViewController: UIViewController, ErrorReporting {
 
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         DataController.shared.errorHandlerDelegate = self
     }

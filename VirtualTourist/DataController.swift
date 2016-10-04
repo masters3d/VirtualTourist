@@ -9,15 +9,6 @@
 import UIKit
 import CoreData
 
-/*
-    let fetchRequest:NSFetchRequest<Pin> = Pin.fetchRequest()
-        fetchRequest.sortDescriptors =  [NSSortDescriptor(key:"latitude", ascending: true)]
-
-    let frc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: CoreDataStack.shared.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-    try! frc.performFetch()
-    print(frc.fetchedObjects)
-*/
-
 extension DataController {
 
    fileprivate func coreDataPinFetchAll() -> [Pin] {

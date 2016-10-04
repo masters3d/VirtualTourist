@@ -17,7 +17,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     var isAlertPresenting: Bool = false
     
     // Error handeling for Data
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         DataController.shared.errorHandlerDelegate = self
     }
