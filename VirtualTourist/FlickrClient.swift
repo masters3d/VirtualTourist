@@ -56,9 +56,9 @@ func randomNumberFrom1To(_ to:Int) -> Int {
 
 extension NetworkOperation {
 
-    static func flickrRandomAroundPinClient(pin:PinAnnotation, delegate: ErrorReporting, successBlock:@escaping (Data?)->Void) -> NetworkOperation {
+    static func flickrNumberOfPageforPin(_ pin:PinAnnotation, delegate: ErrorReporting) -> NetworkOperation {
         
-        let pageBlock:((Data?)->Void) = {
+         let pageBlock:((Data?)->Void) = {
             data in
             guard let data = data, let json = try? JSONSerialization.jsonObject(with: data, options: .mutableLeaves) else {print("error parsing at \(#line) \(#file)"); return}
              guard  let dict = json as? Dictionary<String, Any> else {print("error parsing at \(#line) \(#file)"); return}
@@ -69,17 +69,23 @@ extension NetworkOperation {
             if pages > 1 {
                 pages = randomNumberFrom1To(pages)
             }
-            let photosConnection = ConnectionType.flickrRandomAroundPin(bbox: pin.coordinate, page: pages)
-            
-            let networkRequestPhotos = NetworkOperation.init(typeOfConnection: photosConnection, delegate: delegate, successBlock: successBlock, showActivityOnUI: false)
-            
-            networkRequestPhotos.start()
-            
-        }
+                pin.pagesInFlickr = pages
+            }
+        
         let pageConnection = ConnectionType.flickrRandomAroundPin(bbox: pin.coordinate, page: 1)
 
         let networkRequestPage = NetworkOperation.init(typeOfConnection: pageConnection, delegate: delegate, successBlock: pageBlock, showActivityOnUI: false)
         
-       return networkRequestPage
+        return networkRequestPage
+        
+    }
+
+    static func flickrRandomAroundPinClient(pin:PinAnnotation, delegate: ErrorReporting, successBlock:@escaping (Data?)->Void) -> NetworkOperation {
+        
+        let photosConnection = ConnectionType.flickrRandomAroundPin(bbox: pin.coordinate, page: pin.pagesInFlickr)
+        
+        let networkRequestPhotos = NetworkOperation.init(typeOfConnection: photosConnection, delegate: delegate, successBlock: successBlock, showActivityOnUI: false)
+        
+        return networkRequestPhotos
     }
 }

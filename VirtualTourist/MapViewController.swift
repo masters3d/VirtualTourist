@@ -48,11 +48,24 @@ class MapViewController: UIViewController, ErrorReporting {
     
     func addPin(_ pin:PinAnnotation) {
         mapView.addAnnotation(pin)
-        if DataController.dataController.getPhotos(for: pin).isEmpty {
-         let _ =  DataController.dataController.getPhotos(for: pin, newSet: true)
-       
-         }
         
+        let pagesNumberRequest = NetworkOperation.flickrNumberOfPageforPin(pin, delegate: self)
+        pin.neworkOperationsQueue.addOperation(pagesNumberRequest)
+        
+        if DataController.dataController.getPhotos(for: pin).isEmpty {
+         // sets temp photos on the pin
+         let photos =  DataController.dataController.getPhotos(for: pin, newSet: true)
+         
+         // start download of new photos
+         for each in photos {
+            let block = DataController.dataController.createSuccessBlockForRandomPicAtPin(forCellBlock: {_ in return}, delegate: self, forPhotoID: each.photo_id!, withPin: pin)
+            let operation = NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
+            operation.name = each.photo_id
+            operation.addDependency(pagesNumberRequest)
+            pin.neworkOperationsQueue.addOperation(operation)
+         }
+         
+         }
     }
     
     func removePin(_ pin:PinAnnotation) {
@@ -79,7 +92,6 @@ class MapViewController: UIViewController, ErrorReporting {
     var isAlertPresenting: Bool = false
 
     // Pin to send to segue
-    
     var pin:PinAnnotation?
 
 }

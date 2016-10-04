@@ -30,7 +30,18 @@ class Pin:NSManagedObject,MKAnnotation {
     static func coreDataObject(latitude:Double,longitude:Double) -> Pin {
         return coreDataObject(coordinate:CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
     }
+    
+    //Network Request Tracking
+    let neworkOperationsQueue:OperationQueue = {
+            let queue = OperationQueue()
+            queue.maxConcurrentOperationCount = 2
+            return queue
+            }()
+    
+    var pagesInFlickr:Int = { return 1 }() {didSet{ print("PagesInFlickr Chnaged !!!\(pagesInFlickr)") }}
+    
 }
+
 
 @objc(Photo)
 class Photo: NSManagedObject {
