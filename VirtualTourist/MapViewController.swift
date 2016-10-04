@@ -26,7 +26,7 @@ class MapViewController: UIViewController, ErrorReporting {
             target: self, action: #selector(longPressDetected(_:)))
             )
         // add pins from data store
-        DataController.dataController.getAllPins().forEach { (pin) in
+        DataController.shared.getAllPins().forEach { (pin) in
         
             mapView.addAnnotation(pin)
         }
@@ -48,8 +48,8 @@ class MapViewController: UIViewController, ErrorReporting {
     
     func addPin(_ pin:PinAnnotation) {
         mapView.addAnnotation(pin)
-        if DataController.dataController.getPhotos(for: pin).isEmpty {
-         let _ =  DataController.dataController.getPhotos(for: pin, newSet: true)
+        if let photos = pin.photos as? Set<Photo>, photos.isEmpty {
+         let _ =  DataController.shared.getPlaceHolderPhotos(for: pin)
        
          }
         
@@ -57,7 +57,7 @@ class MapViewController: UIViewController, ErrorReporting {
     
     func removePin(_ pin:PinAnnotation) {
         mapView.removeAnnotation(pin)
-        DataController.dataController.remove(pin)
+        DataController.shared.remove(pin)
     }
 
     lazy var infoView: UILabel = self.infoViewCreator()

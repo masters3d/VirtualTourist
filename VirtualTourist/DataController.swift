@@ -20,6 +20,16 @@ import CoreData
 
 extension DataController {
 
+    static func coreDataFetchPhotosControllerForPin(_ pin:Pin) -> NSFetchedResultsController<Photo> {
+        let fetchRequest:NSFetchRequest<Photo> = Photo.fetchRequest()
+        fetchRequest.sortDescriptors =  [NSSortDescriptor(key:"timeCreated", ascending: true)]
+        fetchRequest.predicate = NSPredicate(format: "pin = %@", argumentArray: [pin])
+        
+        let frc = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: CoreDataStack.shared.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        return frc
+    }
+
+
    fileprivate func coreDataPinFetchAll() -> [Pin] {
     var results = [Pin]()
 
@@ -34,7 +44,6 @@ extension DataController {
         return results
     }
     
-
     fileprivate func coreDataPhotosFetchForPin(_ pin:Pin) -> [Photo]? {
     var results = [Photo]()
         let allPins = self.coreDataPinFetchAll()
@@ -58,11 +67,9 @@ extension DataController {
 
 class DataController {
 
-    static var dataController:DataController {
-        return (UIApplication.shared.delegate as! AppDelegate).dataController
-    }
+    static let shared = DataController()
     
-    private func getPlaceHolderPhotos(for pin:PinAnnotation) -> [Photo] {
+    func getPlaceHolderPhotos(for pin:PinAnnotation) -> [Photo] {
         let image = #imageLiteral(resourceName: "Placeholder")
         let data = UIImagePNGRepresentation(image)
         var photos = [Photo]()
@@ -76,8 +83,18 @@ class DataController {
         }
         return photos
     }
+
+    func getAllPhotos(_ photoController:NSFetchedResultsController<Photo>) -> [Photo] {
+        let _ = try? photoController.performFetch()
+        
+        if let photos = photoController.fetchedObjects {
+            return photos
+        } else {
+            return []
+        }
+    }
     
-    func getPhotos(for pin:PinAnnotation, newSet:Bool = false) -> [Photo] {
+    private func getPhotos(for pin:PinAnnotation, newSet:Bool = false) -> [Photo] {
     var results = [Photo]()
         if let result = self.coreDataPhotosFetchForPin(pin) {
             results = newSet ? self.getPlaceHolderPhotos(for: pin) : result

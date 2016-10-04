@@ -8,23 +8,22 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class DetailPhotosViewController: UIViewController, ErrorReporting,
-    UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDataSourcePrefetching {
+    UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDataSourcePrefetching, NSFetchedResultsControllerDelegate {
 
     // Error Reporting Protocol Requirements
     var errorReported: Error?
     var isAlertPresenting: Bool = false
     
     // Pin passed in from segue
-    var pin:PinAnnotation!
+    var pin:PinAnnotation! {didSet{ photoResultsController = DataController.coreDataFetchPhotosControllerForPin(pin)}}
     func setPinForMap(_ pin:PinAnnotation) {
         self.pin = pin
     }
-    
-    var dataCache:DataController {
-        return DataController.dataController
-    }
+    // result controller
+    var photoResultsController:NSFetchedResultsController<Photo>!
     
     // Operation Que
     let neworkOperationsQueue:OperationQueue = {
@@ -61,7 +60,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         
         collectionView.performBatchUpdates({
             if buttonTitle == Constants.removeSelected {
-                let allPhotos = self.dataCache.getPhotos(for: self.pin)
+                let allPhotos = DataController.shared.getAllPhotos(self.photoResultsController)
                 let indexes = self.selectedIndex.map{$0.row}
                 let photosToRemove = indexes.map{allPhotos[$0]}
                 
@@ -71,17 +70,27 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
                     cell.imageView.alpha = 1
                 }
                 
-                self.collectionView.deleteItems(at: Array(self.selectedIndex))
-                self.selectedIndex.removeAll()
-                self.dataCache.removePhotos(photosToRemove, for: self.pin)
+                self.collectionView.performBatchUpdates({
+                    self.collectionView.deleteItems(at: Array(self.selectedIndex))
+                    self.selectedIndex.removeAll()
+                    DataController.shared.removePhotos(photosToRemove, for: self.pin)
+                    self.neworkOperationsQueue.cancelAllOperations()
+                }, completion: { (_) in
+                   //we could reload stuff here
+                })
                 
-                self.neworkOperationsQueue.cancelAllOperations()
                 
             } else {
                 //this adds place holder photos to coreData
-                self.dataCache.removeAllPhotos(for: self.pin)
-                let _ = self.dataCache.getPhotos(for: self.pin, newSet: true)
-                self.collectionView.reloadSections(IndexSet(integer: 0))
+                self.collectionView.performBatchUpdates({
+                    DataController.shared.removeAllPhotos(for: self.pin)
+                    let _ = DataController.shared.getPlaceHolderPhotos(for: self.pin)
+                    
+//                    DataController.shared.getAllPhotos(self.photoResultsController)
+//                    self.collectionView.reloadSections(IndexSet(integer: 0))
+
+                  let _ =  self.reloadCollectionViewIfEmpty()
+                })
             }
             }, completion: { success in
             self.updateNoImageLabel()
@@ -90,7 +99,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
 
 
     func updateNoImageLabel(){
-        if self.dataCache.getPhotos(for: self.pin).isEmpty {
+        if DataController.shared.getAllPhotos(photoResultsController).isEmpty {
             self.noImagesLabel.isHidden = false
         } else {
             self.noImagesLabel.isHidden = true
@@ -103,6 +112,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.prefetchDataSource = self
+        photoResultsController.delegate = self
     }
     
     override func viewDidLayoutSubviews() {
@@ -116,7 +126,7 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         updateNoImageLabel()
-        return dataCache.getPhotos(for: pin).count
+        return DataController.shared.getAllPhotos(photoResultsController).count
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -133,23 +143,9 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "DetailCellReusableID", for: indexPath) as! DetailCell
-        print("operations-------------->\(neworkOperationsQueue.operations.count)")
-        print("max Operatios-------------->\(neworkOperationsQueue.maxConcurrentOperationCount)")
-
         updateNoImageLabel()
-        let photos = dataCache.getPhotos(for: pin)
-
-        guard !photos.isEmpty else {
-            self.collectionView.performBatchUpdates({
-                self.collectionView.reloadSections(IndexSet(integer: 0))
-                self.collectionView.reloadItems(at: self.collectionView.indexPathsForVisibleItems)
-                }, completion: { (success) in
-            })
         
-            return cell
-        }
-        
-        let photoObject = photos[indexPath.row]
+        let photoObject = photoResultsController.object(at: indexPath)
         
         cell.imageView.image = photoObject.image
         
@@ -163,13 +159,17 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
             return cell
         }
         
+        if reloadCollectionViewIfEmpty() {
+            return cell
+        }
+        
         // check if operation is already going
         
         let cellBlock:(UIImage?)->Void = { (image) in cell.imageView.image = image
                         cell.activityIndicatorStop()
                     }
         
-        let block = dataCache.createSuccessBlockForRandomPicAtPin(forCellBlock: cellBlock, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
+        let block = DataController.shared.createSuccessBlockForRandomPicAtPin(forCellBlock: cellBlock, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
         let operation = NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
         operation.name = photoObject.photo_id
         
@@ -184,25 +184,60 @@ class DetailPhotosViewController: UIViewController, ErrorReporting,
     
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         let indexes = indexPaths.map({$0.row})
-        let photoObjects = dataCache.getPhotos(for: pin).enumerated().filter({indexes.contains($0.offset)}).map{$0.element}
+        let photoObjects = DataController.shared.getAllPhotos(photoResultsController).enumerated().filter({indexes.contains($0.offset)}).map{$0.element}
         
-        for (indexPathofPhoto,photoObject) in zip(indexPaths,photoObjects){
+        for (_,photoObject) in zip(indexPaths,photoObjects){
         
             guard photoObject.isImagePlaceholder, !neworkOperationsQueue.isOperationInQueue(named: photoObject.photo_id ?? "") else { continue }
             
             let blockUpdateCell:(UIImage?)->Void = { _ in
-                    self.collectionView.reloadItems(at: [indexPathofPhoto])
+                   // self.collectionView.reloadItems(at: [indexPathofPhoto])
             }
             
-            let block = dataCache.createSuccessBlockForRandomPicAtPin(forCellBlock: blockUpdateCell, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
+            let block = DataController.shared.createSuccessBlockForRandomPicAtPin(forCellBlock: blockUpdateCell, delegate: self, forPhotoID: photoObject.photo_id!, withPin: pin)
             let operation = NetworkOperation.flickrRandomAroundPinClient(pin: pin, delegate: self, successBlock: block)
             operation.name = photoObject.photo_id
             neworkOperationsQueue.addOperation(operation)
         }
-        
-}
+    }
     
-
+    // Fetch result controller 
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+    
+        switch type {
+        case .update:
+            if let indexPath = indexPath {
+                self.collectionView.reloadItems(at: [indexPath])
+            }
+            if let newIndexPath = newIndexPath {
+                self.collectionView.reloadItems(at: [newIndexPath])
+            }
+        case .delete:
+            let _ = reloadCollectionViewIfEmpty()
+        default: break
+        
+        }
+    }
+    
+    func reloadCollectionViewIfEmpty() -> Bool{
+        let photos = DataController.shared.getAllPhotos(photoResultsController)
+        // this helps prevent the NSInternalInconsistencyException
+        guard !photos.isEmpty else {
+            self.collectionView.performBatchUpdates({
+                self.collectionView.reloadSections(IndexSet(integer: 0))
+                self.collectionView.reloadItems(at: self.collectionView.indexPathsForVisibleItems)
+                }, completion: { (success) in
+            })
+            return true
+        }
+        return false
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+      let _ = reloadCollectionViewIfEmpty()
+    }
+    
 }
 
 
