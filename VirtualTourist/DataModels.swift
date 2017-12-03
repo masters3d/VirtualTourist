@@ -56,6 +56,7 @@ class Photo: NSManagedObject {
     }
 }
 
+
 extension Photo {
     static func coreDataObject(height: Double, imageData: Data, title: String, width: Double, photo_id:String, pin:PinAnnotation, timeCreated:Date = Date()) -> Photo {
         let photo = NSEntityDescription.insertNewObject(forEntityName: "Photo", into:  CoreDataStack.shared.viewContext) as! Photo

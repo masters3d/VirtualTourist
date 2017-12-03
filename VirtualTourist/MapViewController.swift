@@ -42,7 +42,7 @@ class MapViewController: UIViewController, ErrorReporting {
         }
     }
     
-    func longPressDetected(_ gesture: UIGestureRecognizer) {
+    @objc func longPressDetected(_ gesture: UIGestureRecognizer) {
         if gesture.state == .began {
             if isEditing {
                 //TODO:- We could add a message about usability here
