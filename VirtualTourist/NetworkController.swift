@@ -193,7 +193,7 @@ enum ConnectionType {
     var stringValue:String {
         switch self {
         case .lorempixel: return "lorempixel"
-        case .flickrRandomAroundPin(let payload) : return "flickrRandomAroundPin\(payload.bbox.shortDescription)Page\(payload.page)"
+        case .flickrRandomAroundPin(let bbox, let page) : return "flickrRandomAroundPin\(bbox.shortDescription)Page\(page)"
         case .getOneFlickrImage(let payload) : return "getOneFlickrImage \(payload.components(separatedBy: "/").last ?? "")"
         }
     }
@@ -205,8 +205,8 @@ extension NetworkOperation {
         case .lorempixel:
             self.init(url:URL(string: APIConstants.lorempixel)!, keyForData:typeOfConnection.stringValue)
             
-        case .flickrRandomAroundPin(let payload):
-            let querryDict:[String:Any] = ["extras": "url_s", "safe_search": 1, "bbox": payload.bbox.boundingBox, "api_key": APIConstants.flickrAPIKey, "method": "flickr.photos.search", "per_page": 250, "format": "json", "nojsoncallback": 1]
+        case .flickrRandomAroundPin(let bbox, _):
+            let querryDict:[String:Any] = ["extras": "url_s", "safe_search": 1, "bbox": bbox.boundingBox, "api_key": APIConstants.flickrAPIKey, "method": "flickr.photos.search", "per_page": 250, "format": "json", "nojsoncallback": 1]
             guard  let compotentsForUrl = NetworkOperation.componentsMaker(baseUrl:APIConstants.flickrBaseUrl, querryKeyValue: querryDict), let url = compotentsForUrl.url else { fatalError("Malform URL") }
 
             self.init(url: url, keyForData:typeOfConnection.stringValue)

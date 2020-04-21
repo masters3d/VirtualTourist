@@ -18,12 +18,12 @@ final class CoreDataStack {
         let container = NSPersistentContainer(name: "DataModel")
         container.loadPersistentStores(completionHandler: { [weak self](storeDescription, error) in
             if let error = error {
-                NSLog("CoreData error \(error), \(error._userInfo)")
+                NSLog("CoreData error \(error), \(String(describing: error._userInfo))")
                 self?.errorHandler(error)
             }
         print("Location of SQL file for Core Data")
         let applicationSupportURL = FileManager.default.urls(for: FileManager.SearchPathDirectory.applicationSupportDirectory, in: .userDomainMask).last
-          print(applicationSupportURL)
+            print(applicationSupportURL ?? "")
             })
         return container
     }()
@@ -53,7 +53,7 @@ final class CoreDataStack {
             do {
                 try context.save()
             } catch {
-                NSLog("CoreData error \(error), \(error._userInfo)")
+                NSLog("CoreData error \(error), \(String(describing: error._userInfo))")
                 self.errorHandler(error)
             }
         }

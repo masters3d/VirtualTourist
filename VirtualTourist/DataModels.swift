@@ -45,11 +45,11 @@ class Pin:NSManagedObject,MKAnnotation {
 
 @objc(Photo)
 class Photo: NSManagedObject {
-    var image:UIImage? { return UIImage(data: imageData as! Data) }
+    var image:UIImage? { return UIImage(data: imageData!) }
     var isImagePlaceholder:Bool {
         if let image = image {
             let placeholder = #imageLiteral(resourceName: "Placeholder")
-         return  UIImagePNGRepresentation(placeholder) == UIImagePNGRepresentation(image)
+         return  placeholder.pngData() == image.pngData()
         } else {
             return false
         }
@@ -58,15 +58,16 @@ class Photo: NSManagedObject {
 
 
 extension Photo {
-    static func coreDataObject(height: Double, imageData: Data, title: String, width: Double, photo_id:String, pin:PinAnnotation, timeCreated:Date = Date()) -> Photo {
+    static func coreDataObject(height: Double, imageData: Data, title: String, width: Double, photo_id:String, pin:PinAnnotation, timeCreated:Date = Date()
+        ) -> Photo {
         let photo = NSEntityDescription.insertNewObject(forEntityName: "Photo", into:  CoreDataStack.shared.viewContext) as! Photo
         photo.title = title
         photo.height = height
-        photo.imageData = imageData as NSData?
+        photo.imageData = imageData
         photo.width = width
         photo.photo_id = photo_id
         photo.pin = pin
-        photo.timeCreated = timeCreated as NSDate
+        photo.timeCreated = timeCreated
         return photo
     }
     
@@ -76,7 +77,7 @@ extension Photo {
             photoToEdit in
             photoToEdit.title = title
             photoToEdit.height = height
-            photoToEdit.imageData = imageData as NSData?
+            photoToEdit.imageData = imageData
             photoToEdit.width = width
             photoToEdit.photo_id = photo_id
 //            photoToEdit.pin = pin.coreDataPin
