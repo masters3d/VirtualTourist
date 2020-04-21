@@ -11,7 +11,7 @@ import MapKit
 
 extension OperationQueue {
     func isOperationInQueue(named:String) -> Bool {
-       guard let _ =  self.operations.map({$0.name}).flatMap({$0}).filter({$0 == named}).first else { return false }
+       guard let _ =  self.operations.map({$0.name}).compactMap({$0}).filter({$0 == named}).first else { return false }
             return true
     }
 }
@@ -28,7 +28,7 @@ extension UIColor {
 extension DetailPhotosViewController {
     func setMap(_ map:MKMapView ,with pin:PinAnnotation) {
         let span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
-        let region = MKCoordinateRegionMake(pin.coordinate, span)
+        let region = MKCoordinateRegion.init(center: pin.coordinate, span: span)
         map.setRegion(region, animated: true)
         map.isUserInteractionEnabled = false
         map.addAnnotation(pin)

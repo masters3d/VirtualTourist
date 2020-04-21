@@ -64,7 +64,7 @@ class DataController {
     
     private func getPlaceHolderPhotos(for pin:PinAnnotation) -> [Photo] {
         let image = #imageLiteral(resourceName: "Placeholder")
-        let data = UIImagePNGRepresentation(image)
+        let data = image.pngData()
         var photos = [Photo]()
         
         for each in 1...APIConstants.albumSize {
