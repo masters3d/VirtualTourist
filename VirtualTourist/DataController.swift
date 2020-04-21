@@ -29,7 +29,7 @@ extension DataController {
     fileprivate func coreDataPhotosFetchForPin(_ pin:Pin) -> [Photo]? {
     var results = [Photo]()
         let allPins = self.coreDataPinFetchAll()
-        if let indexOfPin = allPins.index(of: pin),
+        if let indexOfPin = allPins.firstIndex(of: pin),
             let photosSet = allPins[indexOfPin].photos,
             let photos = photosSet as? Set<Photo> {
             
